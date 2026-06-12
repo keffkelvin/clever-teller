@@ -44,7 +44,7 @@ export function SimpleCrud({
     const payload: Record<string, unknown> = { owner_id: u.user.id };
     for (const f of fields) payload[f.key] = form[f.key] || null;
     const res = editing
-      ? await supabase.from(table).update(payload).eq("id", editing.id)
+      ? await supabase.from(table).update(payload as never).eq("id", editing.id)
       : await supabase.from(table).insert(payload as never);
     if (res.error) return toast.error(res.error.message);
     toast.success(editing ? "Updated" : "Added");

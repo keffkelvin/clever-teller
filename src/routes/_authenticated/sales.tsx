@@ -71,9 +71,9 @@ function SalesPage() {
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <StatCard icon={DollarSign} label="Today's revenue" value={`GH₵${todayRevenue.toFixed(2)}`} />
+        <StatCard icon={DollarSign} label="Today's revenue" value={`KSh ${todayRevenue.toFixed(2)}`} />
         <StatCard icon={ShoppingBag} label="Today's sales" value={String(todaySales.length)} />
-        <StatCard icon={TrendingUp} label="All-time revenue" value={`GH₵${totalRevenue.toFixed(2)}`} />
+        <StatCard icon={TrendingUp} label="All-time revenue" value={`KSh ${totalRevenue.toFixed(2)}`} />
       </div>
 
       <Card>
@@ -99,7 +99,7 @@ function SalesPage() {
                     <TableCell className="font-medium">{new Date(s.created_at).toLocaleString()}</TableCell>
                     <TableCell className="hidden sm:table-cell text-muted-foreground">{s.customer_name || "Walk-in"}</TableCell>
                     <TableCell><Badge variant="outline">{s.payment_method}</Badge></TableCell>
-                    <TableCell className="text-right font-semibold">GH₵{Number(s.total).toFixed(2)}</TableCell>
+                    <TableCell className="text-right font-semibold">KSh {Number(s.total).toFixed(2)}</TableCell>
                   </TableRow>
                 ))}
               </TableBody>
@@ -124,16 +124,16 @@ function SalesPage() {
                 {items.map((i) => (
                   <div key={i.id} className="flex justify-between text-sm">
                     <span>{i.product_name} × {i.quantity}</span>
-                    <span>GH₵{Number(i.line_total).toFixed(2)}</span>
+                    <span>KSh {Number(i.line_total).toFixed(2)}</span>
                   </div>
                 ))}
               </div>
               <div className="space-y-1 text-sm">
-                <div className="flex justify-between"><span>Subtotal</span><span>GH₵{Number(selected.subtotal).toFixed(2)}</span></div>
+                <div className="flex justify-between"><span>Subtotal</span><span>KSh {Number(selected.subtotal).toFixed(2)}</span></div>
                 {Number(selected.discount) > 0 && (
-                  <div className="flex justify-between text-muted-foreground"><span>Discount</span><span>− GH₵{Number(selected.discount).toFixed(2)}</span></div>
+                  <div className="flex justify-between text-muted-foreground"><span>Discount</span><span>− KSh {Number(selected.discount).toFixed(2)}</span></div>
                 )}
-                <div className="flex justify-between font-bold text-base pt-1"><span>Total</span><span>GH₵{Number(selected.total).toFixed(2)}</span></div>
+                <div className="flex justify-between font-bold text-base pt-1"><span>Total</span><span>KSh {Number(selected.total).toFixed(2)}</span></div>
               </div>
               <Button className="w-full" onClick={() => window.print()}>Print</Button>
             </div>
