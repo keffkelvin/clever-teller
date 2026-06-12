@@ -1,0 +1,1 @@
+DROP FUNCTION IF EXISTS public.decrement_stock(UUID, INTEGER);
