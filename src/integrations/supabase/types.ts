@@ -14,13 +14,153 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      products: {
+        Row: {
+          barcode: string | null
+          category: string
+          cost: number
+          created_at: string
+          id: string
+          image_url: string | null
+          low_stock_threshold: number
+          name: string
+          owner_id: string
+          price: number
+          sku: string | null
+          stock: number
+          updated_at: string
+        }
+        Insert: {
+          barcode?: string | null
+          category?: string
+          cost?: number
+          created_at?: string
+          id?: string
+          image_url?: string | null
+          low_stock_threshold?: number
+          name: string
+          owner_id: string
+          price?: number
+          sku?: string | null
+          stock?: number
+          updated_at?: string
+        }
+        Update: {
+          barcode?: string | null
+          category?: string
+          cost?: number
+          created_at?: string
+          id?: string
+          image_url?: string | null
+          low_stock_threshold?: number
+          name?: string
+          owner_id?: string
+          price?: number
+          sku?: string | null
+          stock?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      sale_items: {
+        Row: {
+          created_at: string
+          id: string
+          line_total: number
+          owner_id: string
+          product_id: string | null
+          product_name: string
+          quantity: number
+          sale_id: string
+          unit_price: number
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          line_total: number
+          owner_id: string
+          product_id?: string | null
+          product_name: string
+          quantity: number
+          sale_id: string
+          unit_price: number
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          line_total?: number
+          owner_id?: string
+          product_id?: string | null
+          product_name?: string
+          quantity?: number
+          sale_id?: string
+          unit_price?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sale_items_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sale_items_sale_id_fkey"
+            columns: ["sale_id"]
+            isOneToOne: false
+            referencedRelation: "sales"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      sales: {
+        Row: {
+          created_at: string
+          customer_name: string | null
+          discount: number
+          id: string
+          notes: string | null
+          owner_id: string
+          payment_method: string
+          subtotal: number
+          tax: number
+          total: number
+        }
+        Insert: {
+          created_at?: string
+          customer_name?: string | null
+          discount?: number
+          id?: string
+          notes?: string | null
+          owner_id: string
+          payment_method?: string
+          subtotal?: number
+          tax?: number
+          total?: number
+        }
+        Update: {
+          created_at?: string
+          customer_name?: string | null
+          discount?: number
+          id?: string
+          notes?: string | null
+          owner_id?: string
+          payment_method?: string
+          subtotal?: number
+          tax?: number
+          total?: number
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      decrement_stock: {
+        Args: { p_product_id: string; p_quantity: number }
+        Returns: undefined
+      }
     }
     Enums: {
       [_ in never]: never
