@@ -157,7 +157,7 @@ function PosPage() {
           .eq("id", l.product.id),
       ),
     );
-    toast.success(`Sale complete — GH₵${total.toFixed(2)}`);
+    toast.success(`Sale complete — KSh ${total.toFixed(2)}`);
     setCart([]);
     setCustomer("");
     setDiscount(0);
@@ -223,7 +223,7 @@ function PosPage() {
                 </div>
                 <div className="font-medium text-sm line-clamp-2">{p.name}</div>
                 <div className="flex items-center justify-between mt-1">
-                  <span className="font-semibold">GH₵{Number(p.price).toFixed(2)}</span>
+                  <span className="font-semibold">KSh {Number(p.price).toFixed(2)}</span>
                   <Badge variant={p.stock <= 0 ? "destructive" : p.stock < 5 ? "secondary" : "outline"} className="text-xs">
                     {p.stock}
                   </Badge>
@@ -256,7 +256,7 @@ function PosPage() {
                   <div className="flex-1 min-w-0">
                     <div className="font-medium truncate">{l.product.name}</div>
                     <div className="text-muted-foreground text-xs">
-                      GH₵{Number(l.product.price).toFixed(2)} × {l.qty}
+                      KSh {Number(l.product.price).toFixed(2)} × {l.qty}
                     </div>
                   </div>
                   <div className="flex items-center gap-1">
@@ -306,17 +306,17 @@ function PosPage() {
           <div className="space-y-1 pt-2 border-t text-sm">
             <div className="flex justify-between text-muted-foreground">
               <span>Subtotal</span>
-              <span>GH₵{subtotal.toFixed(2)}</span>
+              <span>KSh {subtotal.toFixed(2)}</span>
             </div>
             {discount > 0 && (
               <div className="flex justify-between text-muted-foreground">
                 <span>Discount</span>
-                <span>− GH₵{discount.toFixed(2)}</span>
+                <span>− KSh {discount.toFixed(2)}</span>
               </div>
             )}
             <div className="flex justify-between font-bold text-lg pt-1">
               <span>Total</span>
-              <span>GH₵{total.toFixed(2)}</span>
+              <span>KSh {total.toFixed(2)}</span>
             </div>
           </div>
 
@@ -326,7 +326,7 @@ function PosPage() {
             disabled={cart.length === 0 || processing}
             onClick={checkout}
           >
-            {processing ? "Processing…" : `Charge GH₵${total.toFixed(2)}`}
+            {processing ? "Processing…" : `Charge KSh ${total.toFixed(2)}`}
           </Button>
         </CardContent>
       </Card>

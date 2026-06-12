@@ -155,8 +155,8 @@ function ProductsPage() {
                   </Select>
                 </div>
                 <div className="grid grid-cols-2 gap-3">
-                  <div><Label>Price (GH₵)</Label><Input type="number" step="0.01" value={form.price} onChange={(e) => setForm({ ...form, price: Number(e.target.value) })} /></div>
-                  <div><Label>Cost (GH₵)</Label><Input type="number" step="0.01" value={form.cost} onChange={(e) => setForm({ ...form, cost: Number(e.target.value) })} /></div>
+                  <div><Label>Price (KSh )</Label><Input type="number" step="0.01" value={form.price} onChange={(e) => setForm({ ...form, price: Number(e.target.value) })} /></div>
+                  <div><Label>Cost (KSh )</Label><Input type="number" step="0.01" value={form.cost} onChange={(e) => setForm({ ...form, cost: Number(e.target.value) })} /></div>
                 </div>
                 <div className="grid grid-cols-2 gap-3">
                   <div><Label>Stock</Label><Input type="number" value={form.stock} onChange={(e) => setForm({ ...form, stock: Number(e.target.value) })} /></div>
@@ -198,7 +198,7 @@ function ProductsPage() {
                     <TableCell className="font-medium">{p.name}</TableCell>
                     <TableCell className="hidden md:table-cell text-muted-foreground">{p.category}</TableCell>
                     <TableCell className="hidden md:table-cell text-muted-foreground">{p.sku || "—"}</TableCell>
-                    <TableCell className="text-right">GH₵{Number(p.price).toFixed(2)}</TableCell>
+                    <TableCell className="text-right">KSh {Number(p.price).toFixed(2)}</TableCell>
                     <TableCell className="text-right">
                       <Badge variant={p.stock <= 0 ? "destructive" : p.stock <= p.low_stock_threshold ? "secondary" : "outline"}>
                         {p.stock}
