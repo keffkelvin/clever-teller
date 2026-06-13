@@ -15,13 +15,19 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedUnitsRouteImport } from './routes/_authenticated/units'
 import { Route as AuthenticatedSuppliersRouteImport } from './routes/_authenticated/suppliers'
 import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated/settings'
+import { Route as AuthenticatedSellReturnsRouteImport } from './routes/_authenticated/sell-returns'
 import { Route as AuthenticatedSalesRouteImport } from './routes/_authenticated/sales'
+import { Route as AuthenticatedQuotationsRouteImport } from './routes/_authenticated/quotations'
 import { Route as AuthenticatedPurchasesRouteImport } from './routes/_authenticated/purchases'
+import { Route as AuthenticatedPurchaseReturnsRouteImport } from './routes/_authenticated/purchase-returns'
 import { Route as AuthenticatedProductsRouteImport } from './routes/_authenticated/products'
 import { Route as AuthenticatedPosRouteImport } from './routes/_authenticated/pos'
+import { Route as AuthenticatedDraftsRouteImport } from './routes/_authenticated/drafts'
+import { Route as AuthenticatedDiscountsRouteImport } from './routes/_authenticated/discounts'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedCustomersRouteImport } from './routes/_authenticated/customers'
 import { Route as AuthenticatedCategoriesRouteImport } from './routes/_authenticated/categories'
+import { Route as AuthenticatedCashRegisterRouteImport } from './routes/_authenticated/cash-register'
 import { Route as AuthenticatedBrandsRouteImport } from './routes/_authenticated/brands'
 
 const AuthRoute = AuthRouteImport.update({
@@ -53,9 +59,20 @@ const AuthenticatedSettingsRoute = AuthenticatedSettingsRouteImport.update({
   path: '/settings',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedSellReturnsRoute =
+  AuthenticatedSellReturnsRouteImport.update({
+    id: '/sell-returns',
+    path: '/sell-returns',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedSalesRoute = AuthenticatedSalesRouteImport.update({
   id: '/sales',
   path: '/sales',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedQuotationsRoute = AuthenticatedQuotationsRouteImport.update({
+  id: '/quotations',
+  path: '/quotations',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedPurchasesRoute = AuthenticatedPurchasesRouteImport.update({
@@ -63,6 +80,12 @@ const AuthenticatedPurchasesRoute = AuthenticatedPurchasesRouteImport.update({
   path: '/purchases',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedPurchaseReturnsRoute =
+  AuthenticatedPurchaseReturnsRouteImport.update({
+    id: '/purchase-returns',
+    path: '/purchase-returns',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedProductsRoute = AuthenticatedProductsRouteImport.update({
   id: '/products',
   path: '/products',
@@ -71,6 +94,16 @@ const AuthenticatedProductsRoute = AuthenticatedProductsRouteImport.update({
 const AuthenticatedPosRoute = AuthenticatedPosRouteImport.update({
   id: '/pos',
   path: '/pos',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedDraftsRoute = AuthenticatedDraftsRouteImport.update({
+  id: '/drafts',
+  path: '/drafts',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedDiscountsRoute = AuthenticatedDiscountsRouteImport.update({
+  id: '/discounts',
+  path: '/discounts',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
@@ -88,6 +121,12 @@ const AuthenticatedCategoriesRoute = AuthenticatedCategoriesRouteImport.update({
   path: '/categories',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedCashRegisterRoute =
+  AuthenticatedCashRegisterRouteImport.update({
+    id: '/cash-register',
+    path: '/cash-register',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedBrandsRoute = AuthenticatedBrandsRouteImport.update({
   id: '/brands',
   path: '/brands',
@@ -98,13 +137,19 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/brands': typeof AuthenticatedBrandsRoute
+  '/cash-register': typeof AuthenticatedCashRegisterRoute
   '/categories': typeof AuthenticatedCategoriesRoute
   '/customers': typeof AuthenticatedCustomersRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/discounts': typeof AuthenticatedDiscountsRoute
+  '/drafts': typeof AuthenticatedDraftsRoute
   '/pos': typeof AuthenticatedPosRoute
   '/products': typeof AuthenticatedProductsRoute
+  '/purchase-returns': typeof AuthenticatedPurchaseReturnsRoute
   '/purchases': typeof AuthenticatedPurchasesRoute
+  '/quotations': typeof AuthenticatedQuotationsRoute
   '/sales': typeof AuthenticatedSalesRoute
+  '/sell-returns': typeof AuthenticatedSellReturnsRoute
   '/settings': typeof AuthenticatedSettingsRoute
   '/suppliers': typeof AuthenticatedSuppliersRoute
   '/units': typeof AuthenticatedUnitsRoute
@@ -113,13 +158,19 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/brands': typeof AuthenticatedBrandsRoute
+  '/cash-register': typeof AuthenticatedCashRegisterRoute
   '/categories': typeof AuthenticatedCategoriesRoute
   '/customers': typeof AuthenticatedCustomersRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/discounts': typeof AuthenticatedDiscountsRoute
+  '/drafts': typeof AuthenticatedDraftsRoute
   '/pos': typeof AuthenticatedPosRoute
   '/products': typeof AuthenticatedProductsRoute
+  '/purchase-returns': typeof AuthenticatedPurchaseReturnsRoute
   '/purchases': typeof AuthenticatedPurchasesRoute
+  '/quotations': typeof AuthenticatedQuotationsRoute
   '/sales': typeof AuthenticatedSalesRoute
+  '/sell-returns': typeof AuthenticatedSellReturnsRoute
   '/settings': typeof AuthenticatedSettingsRoute
   '/suppliers': typeof AuthenticatedSuppliersRoute
   '/units': typeof AuthenticatedUnitsRoute
@@ -130,13 +181,19 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
   '/_authenticated/brands': typeof AuthenticatedBrandsRoute
+  '/_authenticated/cash-register': typeof AuthenticatedCashRegisterRoute
   '/_authenticated/categories': typeof AuthenticatedCategoriesRoute
   '/_authenticated/customers': typeof AuthenticatedCustomersRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
+  '/_authenticated/discounts': typeof AuthenticatedDiscountsRoute
+  '/_authenticated/drafts': typeof AuthenticatedDraftsRoute
   '/_authenticated/pos': typeof AuthenticatedPosRoute
   '/_authenticated/products': typeof AuthenticatedProductsRoute
+  '/_authenticated/purchase-returns': typeof AuthenticatedPurchaseReturnsRoute
   '/_authenticated/purchases': typeof AuthenticatedPurchasesRoute
+  '/_authenticated/quotations': typeof AuthenticatedQuotationsRoute
   '/_authenticated/sales': typeof AuthenticatedSalesRoute
+  '/_authenticated/sell-returns': typeof AuthenticatedSellReturnsRoute
   '/_authenticated/settings': typeof AuthenticatedSettingsRoute
   '/_authenticated/suppliers': typeof AuthenticatedSuppliersRoute
   '/_authenticated/units': typeof AuthenticatedUnitsRoute
@@ -147,13 +204,19 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/brands'
+    | '/cash-register'
     | '/categories'
     | '/customers'
     | '/dashboard'
+    | '/discounts'
+    | '/drafts'
     | '/pos'
     | '/products'
+    | '/purchase-returns'
     | '/purchases'
+    | '/quotations'
     | '/sales'
+    | '/sell-returns'
     | '/settings'
     | '/suppliers'
     | '/units'
@@ -162,13 +225,19 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/brands'
+    | '/cash-register'
     | '/categories'
     | '/customers'
     | '/dashboard'
+    | '/discounts'
+    | '/drafts'
     | '/pos'
     | '/products'
+    | '/purchase-returns'
     | '/purchases'
+    | '/quotations'
     | '/sales'
+    | '/sell-returns'
     | '/settings'
     | '/suppliers'
     | '/units'
@@ -178,13 +247,19 @@ export interface FileRouteTypes {
     | '/_authenticated'
     | '/auth'
     | '/_authenticated/brands'
+    | '/_authenticated/cash-register'
     | '/_authenticated/categories'
     | '/_authenticated/customers'
     | '/_authenticated/dashboard'
+    | '/_authenticated/discounts'
+    | '/_authenticated/drafts'
     | '/_authenticated/pos'
     | '/_authenticated/products'
+    | '/_authenticated/purchase-returns'
     | '/_authenticated/purchases'
+    | '/_authenticated/quotations'
     | '/_authenticated/sales'
+    | '/_authenticated/sell-returns'
     | '/_authenticated/settings'
     | '/_authenticated/suppliers'
     | '/_authenticated/units'
@@ -240,6 +315,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedSettingsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/sell-returns': {
+      id: '/_authenticated/sell-returns'
+      path: '/sell-returns'
+      fullPath: '/sell-returns'
+      preLoaderRoute: typeof AuthenticatedSellReturnsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/sales': {
       id: '/_authenticated/sales'
       path: '/sales'
@@ -247,11 +329,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedSalesRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/quotations': {
+      id: '/_authenticated/quotations'
+      path: '/quotations'
+      fullPath: '/quotations'
+      preLoaderRoute: typeof AuthenticatedQuotationsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/purchases': {
       id: '/_authenticated/purchases'
       path: '/purchases'
       fullPath: '/purchases'
       preLoaderRoute: typeof AuthenticatedPurchasesRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/purchase-returns': {
+      id: '/_authenticated/purchase-returns'
+      path: '/purchase-returns'
+      fullPath: '/purchase-returns'
+      preLoaderRoute: typeof AuthenticatedPurchaseReturnsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/products': {
@@ -266,6 +362,20 @@ declare module '@tanstack/react-router' {
       path: '/pos'
       fullPath: '/pos'
       preLoaderRoute: typeof AuthenticatedPosRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/drafts': {
+      id: '/_authenticated/drafts'
+      path: '/drafts'
+      fullPath: '/drafts'
+      preLoaderRoute: typeof AuthenticatedDraftsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/discounts': {
+      id: '/_authenticated/discounts'
+      path: '/discounts'
+      fullPath: '/discounts'
+      preLoaderRoute: typeof AuthenticatedDiscountsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/dashboard': {
@@ -289,6 +399,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedCategoriesRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/cash-register': {
+      id: '/_authenticated/cash-register'
+      path: '/cash-register'
+      fullPath: '/cash-register'
+      preLoaderRoute: typeof AuthenticatedCashRegisterRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/brands': {
       id: '/_authenticated/brands'
       path: '/brands'
@@ -301,13 +418,19 @@ declare module '@tanstack/react-router' {
 
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedBrandsRoute: typeof AuthenticatedBrandsRoute
+  AuthenticatedCashRegisterRoute: typeof AuthenticatedCashRegisterRoute
   AuthenticatedCategoriesRoute: typeof AuthenticatedCategoriesRoute
   AuthenticatedCustomersRoute: typeof AuthenticatedCustomersRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
+  AuthenticatedDiscountsRoute: typeof AuthenticatedDiscountsRoute
+  AuthenticatedDraftsRoute: typeof AuthenticatedDraftsRoute
   AuthenticatedPosRoute: typeof AuthenticatedPosRoute
   AuthenticatedProductsRoute: typeof AuthenticatedProductsRoute
+  AuthenticatedPurchaseReturnsRoute: typeof AuthenticatedPurchaseReturnsRoute
   AuthenticatedPurchasesRoute: typeof AuthenticatedPurchasesRoute
+  AuthenticatedQuotationsRoute: typeof AuthenticatedQuotationsRoute
   AuthenticatedSalesRoute: typeof AuthenticatedSalesRoute
+  AuthenticatedSellReturnsRoute: typeof AuthenticatedSellReturnsRoute
   AuthenticatedSettingsRoute: typeof AuthenticatedSettingsRoute
   AuthenticatedSuppliersRoute: typeof AuthenticatedSuppliersRoute
   AuthenticatedUnitsRoute: typeof AuthenticatedUnitsRoute
@@ -315,13 +438,19 @@ interface AuthenticatedRouteRouteChildren {
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedBrandsRoute: AuthenticatedBrandsRoute,
+  AuthenticatedCashRegisterRoute: AuthenticatedCashRegisterRoute,
   AuthenticatedCategoriesRoute: AuthenticatedCategoriesRoute,
   AuthenticatedCustomersRoute: AuthenticatedCustomersRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
+  AuthenticatedDiscountsRoute: AuthenticatedDiscountsRoute,
+  AuthenticatedDraftsRoute: AuthenticatedDraftsRoute,
   AuthenticatedPosRoute: AuthenticatedPosRoute,
   AuthenticatedProductsRoute: AuthenticatedProductsRoute,
+  AuthenticatedPurchaseReturnsRoute: AuthenticatedPurchaseReturnsRoute,
   AuthenticatedPurchasesRoute: AuthenticatedPurchasesRoute,
+  AuthenticatedQuotationsRoute: AuthenticatedQuotationsRoute,
   AuthenticatedSalesRoute: AuthenticatedSalesRoute,
+  AuthenticatedSellReturnsRoute: AuthenticatedSellReturnsRoute,
   AuthenticatedSettingsRoute: AuthenticatedSettingsRoute,
   AuthenticatedSuppliersRoute: AuthenticatedSuppliersRoute,
   AuthenticatedUnitsRoute: AuthenticatedUnitsRoute,
