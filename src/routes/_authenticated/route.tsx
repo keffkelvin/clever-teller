@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import {
   LayoutDashboard, ShoppingCart, Package, Receipt, Users, Truck, ShoppingBag,
   Tags, Bookmark, Ruler, Settings as SettingsIcon, LogOut, Zap, Menu, X, ChevronRight, ChevronDown,
+  FileText, Undo2, Percent, Wallet, RotateCcw,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -43,14 +44,28 @@ const groups: NavGroup[] = [
   {
     label: "Purchases",
     icon: ShoppingBag,
-    items: [{ to: "/purchases", label: "Purchases", icon: ShoppingBag }],
+    items: [
+      { to: "/purchases", label: "List Purchases", icon: ShoppingBag },
+      { to: "/purchase-returns", label: "Purchase Returns", icon: RotateCcw },
+    ],
+  },
+  {
+    label: "Sell",
+    icon: Receipt,
+    items: [
+      { to: "/sales", label: "All Sales", icon: Receipt },
+      { to: "/pos", label: "POS Register", icon: ShoppingCart },
+      { to: "/drafts", label: "Drafts", icon: FileText },
+      { to: "/quotations", label: "Quotations", icon: FileText },
+      { to: "/sell-returns", label: "Sell Returns", icon: Undo2 },
+      { to: "/discounts", label: "Discounts", icon: Percent },
+      { to: "/cash-register", label: "Cash Register", icon: Wallet },
+    ],
   },
 ];
 
 const topLevel: NavItem[] = [
   { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
-  { to: "/pos", label: "Register", icon: ShoppingCart },
-  { to: "/sales", label: "Sales", icon: Receipt },
 ];
 
 function AuthLayout() {
