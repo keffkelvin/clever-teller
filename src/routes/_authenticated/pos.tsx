@@ -204,15 +204,16 @@ function PosPage() {
     const { data: u } = await supabase.auth.getUser();
     if (!u.user) return;
     const cust = customers.find((c) => c.id === customerId);
-    const { data: d, error } = await (supabase.from("drafts") as never).insert({
+    const sbAny = supabase as unknown as { from: (t: string) => { insert: (v: unknown) => { select: () => { single: () => Promise<{ data: { id: string } | null; error: { message: string } | null }> } } & Promise<{ error: { message: string } | null }> } };
+    const { data: d, error } = await sbAny.from("drafts").insert({
       owner_id: u.user.id, draft_type: "draft",
       customer_id: cust?.id ?? null, customer_name: cust?.name ?? null,
       contact_number: cust?.phone ?? null,
       subtotal, tax, tax_rate: taxRate, discount, total,
     }).select().single();
     if (error || !d) return toast.error(error?.message ?? "Failed");
-    await (supabase.from("draft_items") as never).insert(cart.map((l) => ({
-      draft_id: (d as { id: string }).id, owner_id: u.user!.id,
+    await sbAny.from("draft_items").insert(cart.map((l) => ({
+      draft_id: d.id, owner_id: u.user!.id,
       product_id: l.product.id, product_name: l.product.name,
       unit_price: l.product.price, quantity: l.qty,
       discount: l.discount, line_total: l.qty * l.product.price - l.discount,
