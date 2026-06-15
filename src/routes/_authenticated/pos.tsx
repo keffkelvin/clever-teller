@@ -95,7 +95,6 @@ function PosPage() {
     if (!p) return toast.error(`No product for ${code}`);
     addToCart(p);
   };
-  void data;
 
   const categories = useMemo(() => {
     const s = new Set(products.map((p) => p.category));
