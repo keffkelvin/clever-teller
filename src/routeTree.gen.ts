@@ -14,6 +14,7 @@ import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedUnitsRouteImport } from './routes/_authenticated/units'
 import { Route as AuthenticatedSuppliersRouteImport } from './routes/_authenticated/suppliers'
+import { Route as AuthenticatedStockAdjustmentsRouteImport } from './routes/_authenticated/stock-adjustments'
 import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated/settings'
 import { Route as AuthenticatedSellReturnsRouteImport } from './routes/_authenticated/sell-returns'
 import { Route as AuthenticatedSalesRouteImport } from './routes/_authenticated/sales'
@@ -55,6 +56,12 @@ const AuthenticatedSuppliersRoute = AuthenticatedSuppliersRouteImport.update({
   path: '/suppliers',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedStockAdjustmentsRoute =
+  AuthenticatedStockAdjustmentsRouteImport.update({
+    id: '/stock-adjustments',
+    path: '/stock-adjustments',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedSettingsRoute = AuthenticatedSettingsRouteImport.update({
   id: '/settings',
   path: '/settings',
@@ -158,6 +165,7 @@ export interface FileRoutesByFullPath {
   '/sales': typeof AuthenticatedSalesRoute
   '/sell-returns': typeof AuthenticatedSellReturnsRoute
   '/settings': typeof AuthenticatedSettingsRoute
+  '/stock-adjustments': typeof AuthenticatedStockAdjustmentsRoute
   '/suppliers': typeof AuthenticatedSuppliersRoute
   '/units': typeof AuthenticatedUnitsRoute
 }
@@ -180,6 +188,7 @@ export interface FileRoutesByTo {
   '/sales': typeof AuthenticatedSalesRoute
   '/sell-returns': typeof AuthenticatedSellReturnsRoute
   '/settings': typeof AuthenticatedSettingsRoute
+  '/stock-adjustments': typeof AuthenticatedStockAdjustmentsRoute
   '/suppliers': typeof AuthenticatedSuppliersRoute
   '/units': typeof AuthenticatedUnitsRoute
 }
@@ -204,6 +213,7 @@ export interface FileRoutesById {
   '/_authenticated/sales': typeof AuthenticatedSalesRoute
   '/_authenticated/sell-returns': typeof AuthenticatedSellReturnsRoute
   '/_authenticated/settings': typeof AuthenticatedSettingsRoute
+  '/_authenticated/stock-adjustments': typeof AuthenticatedStockAdjustmentsRoute
   '/_authenticated/suppliers': typeof AuthenticatedSuppliersRoute
   '/_authenticated/units': typeof AuthenticatedUnitsRoute
 }
@@ -228,6 +238,7 @@ export interface FileRouteTypes {
     | '/sales'
     | '/sell-returns'
     | '/settings'
+    | '/stock-adjustments'
     | '/suppliers'
     | '/units'
   fileRoutesByTo: FileRoutesByTo
@@ -250,6 +261,7 @@ export interface FileRouteTypes {
     | '/sales'
     | '/sell-returns'
     | '/settings'
+    | '/stock-adjustments'
     | '/suppliers'
     | '/units'
   id:
@@ -273,6 +285,7 @@ export interface FileRouteTypes {
     | '/_authenticated/sales'
     | '/_authenticated/sell-returns'
     | '/_authenticated/settings'
+    | '/_authenticated/stock-adjustments'
     | '/_authenticated/suppliers'
     | '/_authenticated/units'
   fileRoutesById: FileRoutesById
@@ -318,6 +331,13 @@ declare module '@tanstack/react-router' {
       path: '/suppliers'
       fullPath: '/suppliers'
       preLoaderRoute: typeof AuthenticatedSuppliersRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/stock-adjustments': {
+      id: '/_authenticated/stock-adjustments'
+      path: '/stock-adjustments'
+      fullPath: '/stock-adjustments'
+      preLoaderRoute: typeof AuthenticatedStockAdjustmentsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/settings': {
@@ -452,6 +472,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedSalesRoute: typeof AuthenticatedSalesRoute
   AuthenticatedSellReturnsRoute: typeof AuthenticatedSellReturnsRoute
   AuthenticatedSettingsRoute: typeof AuthenticatedSettingsRoute
+  AuthenticatedStockAdjustmentsRoute: typeof AuthenticatedStockAdjustmentsRoute
   AuthenticatedSuppliersRoute: typeof AuthenticatedSuppliersRoute
   AuthenticatedUnitsRoute: typeof AuthenticatedUnitsRoute
 }
@@ -473,6 +494,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedSalesRoute: AuthenticatedSalesRoute,
   AuthenticatedSellReturnsRoute: AuthenticatedSellReturnsRoute,
   AuthenticatedSettingsRoute: AuthenticatedSettingsRoute,
+  AuthenticatedStockAdjustmentsRoute: AuthenticatedStockAdjustmentsRoute,
   AuthenticatedSuppliersRoute: AuthenticatedSuppliersRoute,
   AuthenticatedUnitsRoute: AuthenticatedUnitsRoute,
 }
