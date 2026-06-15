@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import {
   LayoutDashboard, ShoppingCart, Package, Receipt, Users, Truck, ShoppingBag,
   Tags, Bookmark, Ruler, Settings as SettingsIcon, LogOut, Zap, Menu, X, ChevronRight, ChevronDown,
-  FileText, Undo2, Percent, Wallet, RotateCcw,
+  FileText, Undo2, Percent, Wallet, RotateCcw, BarChart3, ClipboardList, UserCog,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -60,6 +60,28 @@ const groups: NavGroup[] = [
       { to: "/sell-returns", label: "Sell Returns", icon: Undo2 },
       { to: "/discounts", label: "Discounts", icon: Percent },
       { to: "/cash-register", label: "Cash Register", icon: Wallet },
+    ],
+  },
+  {
+    label: "Stock",
+    icon: ClipboardList,
+    items: [
+      { to: "/stock-adjustments", label: "Stock Adjustments", icon: ClipboardList },
+    ],
+  },
+  {
+    label: "Accounts",
+    icon: Wallet,
+    items: [
+      { to: "/expenses", label: "Expenses", icon: Wallet },
+      { to: "/reports", label: "Reports", icon: BarChart3 },
+    ],
+  },
+  {
+    label: "Admin",
+    icon: UserCog,
+    items: [
+      { to: "/users", label: "User Management", icon: UserCog },
     ],
   },
 ];

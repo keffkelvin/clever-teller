@@ -379,6 +379,80 @@ export type Database = {
           },
         ]
       }
+      expense_categories: {
+        Row: {
+          created_at: string
+          id: string
+          name: string
+          owner_id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          name: string
+          owner_id: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          name?: string
+          owner_id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      expenses: {
+        Row: {
+          amount: number
+          category_id: string | null
+          category_name: string | null
+          created_at: string
+          expense_date: string
+          id: string
+          note: string | null
+          owner_id: string
+          payment_method: string
+          reference_no: string | null
+          updated_at: string
+        }
+        Insert: {
+          amount?: number
+          category_id?: string | null
+          category_name?: string | null
+          created_at?: string
+          expense_date?: string
+          id?: string
+          note?: string | null
+          owner_id: string
+          payment_method?: string
+          reference_no?: string | null
+          updated_at?: string
+        }
+        Update: {
+          amount?: number
+          category_id?: string | null
+          category_name?: string | null
+          created_at?: string
+          expense_date?: string
+          id?: string
+          note?: string | null
+          owner_id?: string
+          payment_method?: string
+          reference_no?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "expenses_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "expense_categories"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       products: {
         Row: {
           barcode: string | null
@@ -909,6 +983,47 @@ export type Database = {
             columns: ["customer_id"]
             isOneToOne: false
             referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      stock_adjustments: {
+        Row: {
+          adjustment_type: string
+          created_at: string
+          id: string
+          owner_id: string
+          product_id: string
+          product_name: string
+          quantity: number
+          reason: string | null
+        }
+        Insert: {
+          adjustment_type?: string
+          created_at?: string
+          id?: string
+          owner_id: string
+          product_id: string
+          product_name: string
+          quantity: number
+          reason?: string | null
+        }
+        Update: {
+          adjustment_type?: string
+          created_at?: string
+          id?: string
+          owner_id?: string
+          product_id?: string
+          product_name?: string
+          quantity?: number
+          reason?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "stock_adjustments_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
             referencedColumns: ["id"]
           },
         ]

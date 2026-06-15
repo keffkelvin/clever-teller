@@ -63,11 +63,9 @@ function PosPage() {
       supabase.from("customers").select("id,name,phone").order("name"),
     ]);
     if (error) return toast.error(error.message);
-    setProducts((data ?? []) as Product[]);
+    setProducts((pd ?? []) as Product[]);
     setCustomers((cd ?? []) as Customer[]);
   };
-  // alias so old logic compiles
-  const data = null as unknown as Product[];
 
   useEffect(() => { load(); searchRef.current?.focus(); }, []);
 
@@ -97,7 +95,6 @@ function PosPage() {
     if (!p) return toast.error(`No product for ${code}`);
     addToCart(p);
   };
-  void data;
 
   const categories = useMemo(() => {
     const s = new Set(products.map((p) => p.category));
