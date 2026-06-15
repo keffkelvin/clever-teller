@@ -19,7 +19,7 @@ type Sale = { id: string; total: number; subtotal: number; discount: number; tax
 type SaleItem = { product_name: string; quantity: number; unit_price: number; line_total: number; sale_id: string };
 type Purchase = { id: string; total: number; created_at: string };
 type Expense = { amount: number; expense_date: string; category_name: string | null };
-type Product = { id: string; name: string; stock: number; price: number; cost_price: number | null; low_stock_threshold: number | null };
+type Product = { id: string; name: string; stock: number; price: number; cost: number | null; low_stock_threshold: number | null };
 
 function startOfMonth() { const d = new Date(); d.setDate(1); d.setHours(0, 0, 0, 0); return d.toISOString().slice(0, 10); }
 function today() { return new Date().toISOString().slice(0, 10); }
@@ -51,7 +51,7 @@ function ReportsPage() {
         supabase.from("sales").select("id,total,subtotal,discount,tax,payment_method,created_at").gte("created_at", fromIso).lt("created_at", toIso).order("created_at"),
         supabase.from("purchases").select("id,total,created_at").gte("created_at", fromIso).lt("created_at", toIso),
         supabase.from("expenses").select("amount,expense_date,category_name").gte("expense_date", from).lte("expense_date", to),
-        supabase.from("products").select("id,name,stock,price,cost_price,low_stock_threshold"),
+        supabase.from("products").select("id,name,stock,price,cost,low_stock_threshold"),
       ]);
       setSales((s.data ?? []) as Sale[]);
       setPurchases((p.data ?? []) as Purchase[]);
@@ -90,7 +90,7 @@ function ReportsPage() {
   }, [items]);
 
   const lowStock = products.filter((p) => p.stock <= Number(p.low_stock_threshold ?? 5));
-  const stockValue = products.reduce((s, p) => s + Number(p.stock) * Number(p.cost_price ?? p.price ?? 0), 0);
+  const stockValue = products.reduce((s, p) => s + Number(p.stock) * Number(p.cost ?? p.price ?? 0), 0);
 
   return (
     <div className="space-y-4">
