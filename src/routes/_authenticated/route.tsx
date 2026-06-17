@@ -60,6 +60,7 @@ const groups: NavGroup[] = [
       { to: "/sell-returns", label: "Sell Returns", icon: Undo2 },
       { to: "/discounts", label: "Discounts", icon: Percent },
       { to: "/cash-register", label: "Cash Register", icon: Wallet },
+      { to: "/shipments", label: "Shipments", icon: Truck },
     ],
   },
   {
