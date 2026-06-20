@@ -1133,6 +1133,14 @@ export type Database = {
         }
         Returns: boolean
       }
+      test_user_roles_rls: {
+        Args: never
+        Returns: {
+          detail: string
+          passed: boolean
+          test_name: string
+        }[]
+      }
     }
     Enums: {
       app_role: "admin" | "manager" | "cashier"
