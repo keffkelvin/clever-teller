@@ -383,6 +383,18 @@ function PosPage() {
           </Select>
         </div>
         <div className="text-xs text-muted-foreground flex items-center gap-2"><ScanBarcode className="h-3 w-3"/> Barcode scanner ready — scan anywhere</div>
+        <div className="flex flex-wrap items-center gap-2 text-xs">
+          <Button asChild variant="outline" size="sm"><Link to="/drafts"><FileText className="h-3 w-3" /> Recall draft</Link></Button>
+          {openRegister ? (
+            <span className="inline-flex items-center gap-1 text-emerald-600 dark:text-emerald-400">
+              <Wallet className="h-3 w-3" /> Register open since {new Date(openRegister.opened_at).toLocaleTimeString("en-KE")}
+            </span>
+          ) : (
+            <Button asChild variant="ghost" size="sm" className="text-amber-600">
+              <Link to="/cash-register"><Wallet className="h-3 w-3" /> Open cash register</Link>
+            </Button>
+          )}
+        </div>
 
         {products.length === 0 ? (
           <Card>
@@ -504,12 +516,33 @@ function PosPage() {
                 <Input type="number" min={0} step="0.01" placeholder="0.00" value={tendered} onChange={(e) => setTendered(e.target.value)} />
               </div>
             </div>
+            {discounts.length > 0 && (
+              <div>
+                <Label className="text-xs">Promo discount</Label>
+                <Select value={discountId} onValueChange={setDiscountId}>
+                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="none">No promo</SelectItem>
+                    {discounts.map((d) => (
+                      <SelectItem key={d.id} value={d.id}>
+                        {d.name} — {d.discount_type === "percentage" ? `${d.discount_amount}%` : formatMoney(d.discount_amount)}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
           </div>
 
           <div className="space-y-1 pt-2 border-t text-sm">
             <div className="flex justify-between text-muted-foreground">
               <span>Subtotal</span><span>{formatMoney(subtotal)}</span>
             </div>
+            {promoAmount > 0 && (
+              <div className="flex justify-between text-muted-foreground">
+                <span>{promo?.name ?? "Promo"}</span><span>− {formatMoney(promoAmount)}</span>
+              </div>
+            )}
             {discount > 0 && (
               <div className="flex justify-between text-muted-foreground">
                 <span>Discount</span><span>− {formatMoney(discount)}</span>
