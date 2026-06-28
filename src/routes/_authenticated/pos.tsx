@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link, useSearch } from "@tanstack/react-router";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Plus, Minus, Trash2, Search, X, Package, Save, Printer, ScanBarcode } from "lucide-react";
+import { Plus, Minus, Trash2, Search, X, Package, Save, Printer, ScanBarcode, FileText, Wallet } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { formatMoney } from "@/lib/money";
@@ -22,9 +22,18 @@ type Product = {
   price: number;
   stock: number;
   image_url: string | null;
-  tax_rate: number | null;
 };
 type Customer = { id: string; name: string; phone: string | null };
+type Discount = {
+  id: string;
+  name: string;
+  discount_type: "percentage" | "fixed";
+  discount_amount: number;
+  starts_at: string | null;
+  ends_at: string | null;
+  is_active: boolean;
+};
+type OpenRegister = { id: string; opened_at: string; opening_cash: number };
 
 type CartLine = {
   product: Product;
@@ -35,11 +44,17 @@ type CartLine = {
 export const Route = createFileRoute("/_authenticated/pos")({
   head: () => ({ meta: [{ title: "Register — Shop POS" }] }),
   component: PosPage,
+  validateSearch: (s: Record<string, unknown>) => ({
+    draft: typeof s.draft === "string" ? s.draft : undefined,
+  }),
 });
 
 function PosPage() {
   const [products, setProducts] = useState<Product[]>([]);
   const [customers, setCustomers] = useState<Customer[]>([]);
+  const [discounts, setDiscounts] = useState<Discount[]>([]);
+  const [discountId, setDiscountId] = useState<string>("none");
+  const [openRegister, setOpenRegister] = useState<OpenRegister | null>(null);
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState<string>("all");
   const [cart, setCart] = useState<CartLine[]>([]);
@@ -50,24 +65,67 @@ function PosPage() {
   const [tendered, setTendered] = useState<string>("");
   const [processing, setProcessing] = useState(false);
   const searchRef = useRef<HTMLInputElement>(null);
+  const search$ = useSearch({ from: "/_authenticated/pos" });
 
   // global barcode scanner: typing fast then Enter
   const scanBuf = useRef<{ buf: string; t: number }>({ buf: "", t: 0 });
 
   const load = async () => {
-    const [{ data: pd, error }, { data: cd }] = await Promise.all([
+    const sbAny = supabase as unknown as {
+      from: (t: string) => {
+        select: (q: string) => {
+          order: (c: string, o?: { ascending: boolean }) => Promise<{ data: unknown; error: { message: string } | null }>;
+          eq: (k: string, v: string) => { order: (c: string, o?: { ascending: boolean }) => { maybeSingle: () => Promise<{ data: unknown }> } };
+        };
+      };
+    };
+    const [{ data: pd, error }, { data: cd }, { data: dd }, { data: reg }] = await Promise.all([
       supabase
-      .from("products")
-      .select("id,name,sku,barcode,category,price,stock,image_url,tax_rate")
-      .order("name"),
+        .from("products")
+        .select("id,name,sku,barcode,category,price,stock,image_url")
+        .order("name"),
       supabase.from("customers").select("id,name,phone").order("name"),
+      sbAny.from("discounts").select("id,name,discount_type,discount_amount,starts_at,ends_at,is_active").order("priority", { ascending: false }) as unknown as Promise<{ data: Discount[] | null; error: { message: string } | null }>,
+      sbAny.from("cash_registers").select("id,opened_at,opening_cash").eq("status", "open").order("opened_at", { ascending: false }).maybeSingle() as unknown as Promise<{ data: OpenRegister | null }>,
     ]);
     if (error) return toast.error(error.message);
     setProducts((pd ?? []) as Product[]);
     setCustomers((cd ?? []) as Customer[]);
+    const now = new Date();
+    setDiscounts(((dd ?? []) as Discount[]).filter((d) =>
+      d.is_active &&
+      (!d.starts_at || new Date(d.starts_at) <= now) &&
+      (!d.ends_at || new Date(d.ends_at) >= now),
+    ));
+    setOpenRegister(reg ?? null);
   };
 
   useEffect(() => { load(); searchRef.current?.focus(); }, []);
+
+  // Recall a draft into the cart from ?draft=<id>
+  useEffect(() => {
+    const id = search$.draft;
+    if (!id || products.length === 0) return;
+    (async () => {
+      const sbAny = supabase as unknown as { from: (t: string) => { select: (q: string) => { eq: (k: string, v: string) => { maybeSingle: () => Promise<{ data: { id: string; customer_id: string | null; tax_rate: number | null; discount: number } | null }>; order: (c: string, o: { ascending: boolean }) => Promise<{ data: { product_id: string | null; quantity: number; unit_price: number; discount: number }[] | null }> } } } };
+      const [{ data: d }, { data: items }] = await Promise.all([
+        sbAny.from("drafts").select("id,customer_id,tax_rate,discount").eq("id", id).maybeSingle(),
+        sbAny.from("draft_items").select("product_id,quantity,unit_price,discount").eq("draft_id", id).order("created_at", { ascending: true }),
+      ]);
+      if (!d || !items) return;
+      const lines: CartLine[] = [];
+      for (const it of items) {
+        const p = products.find((x) => x.id === it.product_id);
+        if (p) lines.push({ product: p, qty: Number(it.quantity), discount: Number(it.discount) });
+      }
+      setCart(lines);
+      setCustomerId(d.customer_id ?? "walkin");
+      setTaxRate(Number(d.tax_rate) || 0);
+      setDiscount(Number(d.discount) || 0);
+      toast.success("Draft recalled");
+    })();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [search$.draft, products.length]);
 
   // global barcode listener
   useEffect(() => {
@@ -150,7 +208,13 @@ function PosPage() {
     setCart((prev) => prev.filter((l) => l.product.id !== id));
 
   const subtotal = cart.reduce((s, l) => s + l.qty * Number(l.product.price), 0);
-  const afterDiscount = Math.max(0, subtotal - discount);
+  const promo = discounts.find((d) => d.id === discountId);
+  const promoAmount = promo
+    ? promo.discount_type === "percentage"
+      ? +((subtotal * Number(promo.discount_amount)) / 100).toFixed(2)
+      : Number(promo.discount_amount)
+    : 0;
+  const afterDiscount = Math.max(0, subtotal - discount - promoAmount);
   const tax = +(afterDiscount * (taxRate / 100)).toFixed(2);
   const total = +(afterDiscount + tax).toFixed(2);
   const tenderedN = Number(tendered) || 0;
@@ -159,7 +223,7 @@ function PosPage() {
   const printReceipt = async (invoiceNo: string) => {
     const { data: bs } = await supabase.from("business_settings").select("*").maybeSingle();
     const cust = customers.find((c) => c.id === customerId);
-    const shop = (bs as { business_name?: string } | null)?.business_name ?? "Photon Electronics";
+    const shop = (bs as { shop_name?: string } | null)?.shop_name ?? "Shop";
     const addr = (bs as { address?: string } | null)?.address ?? "";
     const phone = (bs as { phone?: string } | null)?.phone ?? "";
     const kra = (bs as { kra_pin?: string } | null)?.kra_pin ?? "";
@@ -193,7 +257,7 @@ function PosPage() {
   };
 
   const reset = () => {
-    setCart([]); setCustomerId("walkin"); setDiscount(0); setTendered(""); setPayment("cash");
+    setCart([]); setCustomerId("walkin"); setDiscount(0); setTendered(""); setPayment("cash"); setDiscountId("none");
   };
 
   const holdSale = async () => {
@@ -221,6 +285,9 @@ function PosPage() {
 
   const checkout = async (andPrint = false) => {
     if (cart.length === 0) return;
+    if (payment === "cash" && !openRegister) {
+      return toast.error("Open a cash register session before taking cash payments.");
+    }
     setProcessing(true);
     const { data: userRes } = await supabase.auth.getUser();
     const user = userRes.user;
@@ -236,7 +303,7 @@ function PosPage() {
       .insert({
         owner_id: user.id,
         subtotal,
-        discount,
+        discount: discount + promoAmount,
         tax,
         tax_rate: taxRate,
         total,
@@ -247,6 +314,7 @@ function PosPage() {
         amount_paid: paid,
         payment_status: status,
         sale_type: "pos",
+        register_id: payment === "cash" ? openRegister?.id ?? null : null,
       } as never)
       .select()
       .single();
@@ -269,13 +337,11 @@ function PosPage() {
       setProcessing(false);
       return toast.error(itemsErr.message);
     }
-    // Decrement stock (RLS-scoped)
+    // Atomic stock decrement via RPC — avoids race conditions on concurrent sales
     await Promise.all(
       cart.map((l) =>
-        supabase
-          .from("products")
-          .update({ stock: Math.max(0, l.product.stock - l.qty) })
-          .eq("id", l.product.id),
+        (supabase as unknown as { rpc: (n: string, a: Record<string, unknown>) => Promise<{ error: { message: string } | null }> })
+          .rpc("decrement_stock", { p_product_id: l.product.id, p_quantity: l.qty }),
       ),
     );
     toast.success(`Sale complete — ${formatMoney(total)}${change ? ` · Change ${formatMoney(change)}` : ""}`);
