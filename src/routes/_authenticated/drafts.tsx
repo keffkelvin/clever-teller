@@ -4,7 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Trash2, FileText } from "lucide-react";
+import { Trash2, FileText, RotateCcw } from "lucide-react";
 import { toast } from "sonner";
 import { formatMoney } from "@/lib/money";
 
@@ -48,7 +48,12 @@ export function DraftsList({ type, title, subtitle }: { type: "draft" | "quotati
                 <TableCell>{r.customer_name ?? "Walk-in"}</TableCell>
                 <TableCell className="text-muted-foreground">{r.contact_number ?? "—"}</TableCell>
                 <TableCell className="text-right font-semibold">{formatMoney(r.total)}</TableCell>
-                <TableCell><Button size="icon" variant="ghost" className="text-destructive" onClick={() => remove(r.id)}><Trash2 className="h-4 w-4" /></Button></TableCell>
+                <TableCell className="flex justify-end gap-1">
+                  <Button asChild size="sm" variant="outline" title="Recall to POS">
+                    <Link to="/pos" search={{ draft: r.id }}><RotateCcw className="h-3 w-3" /> Recall</Link>
+                  </Button>
+                  <Button size="icon" variant="ghost" className="text-destructive" onClick={() => remove(r.id)}><Trash2 className="h-4 w-4" /></Button>
+                </TableCell>
               </TableRow>
             ))}</TableBody>
           </Table>

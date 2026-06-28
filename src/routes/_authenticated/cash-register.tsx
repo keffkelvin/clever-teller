@@ -31,8 +31,17 @@ function CashRegisterPage() {
     const { data: h } = await sb.from("cash_registers").select("id,opening_cash,opened_at,closing_cash,closed_at,status").eq("status", "closed").order("opened_at", { ascending: false }).limit(10);
     setHistory(h ?? []);
     if (cur) {
-      const { data: s } = await sb.from("sales").select("amount_paid").eq("payment_method", "cash").gte("created_at", cur.opened_at);
-      setSalesTotal(((s ?? []) as { amount_paid: number }[]).reduce((sum: number, x: { amount_paid: number }) => sum + Number(x.amount_paid || 0), 0));
+      // Prefer the explicit register_id link (set by POS at checkout) and fall back to opened_at window
+      const { data: byId } = await sb.from("sales").select("amount_paid").eq("register_id", cur.id);
+      const linked = ((byId ?? []) as { amount_paid: number }[]);
+      if (linked.length > 0) {
+        setSalesTotal(linked.reduce((sum: number, x: { amount_paid: number }) => sum + Number(x.amount_paid || 0), 0));
+      } else {
+        const { data: s } = await sb.from("sales").select("amount_paid").eq("payment_method", "cash").gte("created_at", cur.opened_at);
+        setSalesTotal(((s ?? []) as { amount_paid: number }[]).reduce((sum: number, x: { amount_paid: number }) => sum + Number(x.amount_paid || 0), 0));
+      }
+    } else {
+      setSalesTotal(0);
     }
   };
   useEffect(() => { load(); }, []);

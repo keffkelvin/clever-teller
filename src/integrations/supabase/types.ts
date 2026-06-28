@@ -916,6 +916,7 @@ export type Database = {
           owner_id: string
           payment_method: string
           payment_status: string
+          register_id: string | null
           sale_type: string
           sell_note: string | null
           shipping_address: string | null
@@ -941,6 +942,7 @@ export type Database = {
           owner_id: string
           payment_method?: string
           payment_status?: string
+          register_id?: string | null
           sale_type?: string
           sell_note?: string | null
           shipping_address?: string | null
@@ -966,6 +968,7 @@ export type Database = {
           owner_id?: string
           payment_method?: string
           payment_status?: string
+          register_id?: string | null
           sale_type?: string
           sell_note?: string | null
           shipping_address?: string | null
@@ -983,6 +986,13 @@ export type Database = {
             columns: ["customer_id"]
             isOneToOne: false
             referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sales_register_id_fkey"
+            columns: ["register_id"]
+            isOneToOne: false
+            referencedRelation: "cash_registers"
             referencedColumns: ["id"]
           },
         ]
@@ -1126,6 +1136,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      decrement_stock: {
+        Args: { p_product_id: string; p_quantity: number }
+        Returns: undefined
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
