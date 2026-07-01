@@ -41,8 +41,24 @@ function SellReturnsPage() {
 
   const pickSale = async (id: string) => {
     setSaleId(id);
-    const { data } = await supabase.from("sale_items").select("id,product_id,product_name,quantity,unit_price").eq("sale_id", id);
-    setItems(((data ?? []) as SaleItem[]).map((i) => ({ ...i, returnQty: 0 })));
+    const [{ data }, { data: prior }] = await Promise.all([
+      supabase.from("sale_items").select("id,product_id,product_name,quantity,unit_price").eq("sale_id", id),
+      // prior returned qty per product for this sale
+      (supabase as unknown as { from: (t: string) => { select: (q: string) => { eq: (k: string, v: string) => Promise<{ data: { product_id: string | null; quantity: number; sale_returns: { sale_id: string | null } | null }[] | null }> } } })
+        .from("sale_return_items")
+        .select("product_id,quantity,sale_returns!inner(sale_id)")
+        .eq("sale_returns.sale_id", id),
+    ]);
+    const returnedByProduct = new Map<string, number>();
+    for (const row of (prior ?? [])) {
+      if (!row.product_id) continue;
+      returnedByProduct.set(row.product_id, (returnedByProduct.get(row.product_id) ?? 0) + Number(row.quantity));
+    }
+    setItems(((data ?? []) as SaleItem[]).map((i) => {
+      const already = i.product_id ? (returnedByProduct.get(i.product_id) ?? 0) : 0;
+      const remaining = Math.max(0, i.quantity - already);
+      return { ...i, quantity: remaining, returnQty: 0 };
+    }).filter((i) => i.quantity > 0));
   };
 
   const submit = async () => {
