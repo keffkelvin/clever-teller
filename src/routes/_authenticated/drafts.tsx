@@ -41,10 +41,11 @@ export function DraftsList({ type, title, subtitle }: { type: "draft" | "quotati
           <div className="py-16 text-center text-muted-foreground"><FileText className="h-10 w-10 mx-auto mb-2 opacity-40" /><p>No {title.toLowerCase()} yet</p></div>
         ) : (
           <Table>
-            <TableHeader><TableRow><TableHead>Date</TableHead><TableHead>Customer</TableHead><TableHead>Phone</TableHead><TableHead className="text-right">Total</TableHead><TableHead className="w-12"></TableHead></TableRow></TableHeader>
+            <TableHeader><TableRow><TableHead>Date</TableHead><TableHead>Ref #</TableHead><TableHead>Customer</TableHead><TableHead>Phone</TableHead><TableHead className="text-right">Total</TableHead><TableHead className="w-12"></TableHead></TableRow></TableHeader>
             <TableBody>{rows.map((r) => (
               <TableRow key={r.id}>
                 <TableCell>{new Date(r.created_at).toLocaleString("en-KE")}</TableCell>
+                <TableCell className="font-mono text-xs">{r.reference_no ?? r.id.slice(0, 8)}</TableCell>
                 <TableCell>{r.customer_name ?? "Walk-in"}</TableCell>
                 <TableCell className="text-muted-foreground">{r.contact_number ?? "—"}</TableCell>
                 <TableCell className="text-right font-semibold">{formatMoney(r.total)}</TableCell>
