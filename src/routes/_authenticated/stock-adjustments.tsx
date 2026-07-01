@@ -11,10 +11,11 @@ import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogT
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Plus } from "lucide-react";
 import { toast } from "sonner";
+import { RoleGate } from "@/components/role-gate";
 
 export const Route = createFileRoute("/_authenticated/stock-adjustments")({
   head: () => ({ meta: [{ title: "Stock Adjustments — Shop POS" }] }),
-  component: StockAdjustmentsPage,
+  component: () => <RoleGate level="manager"><StockAdjustmentsPage /></RoleGate>,
 });
 
 type Product = { id: string; name: string; stock: number };
