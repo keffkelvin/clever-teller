@@ -12,10 +12,11 @@ import { Badge } from "@/components/ui/badge";
 import { Plus, Trash2, ShoppingBag } from "lucide-react";
 import { toast } from "sonner";
 import { formatMoney } from "@/lib/money";
+import { RoleGate } from "@/components/role-gate";
 
 export const Route = createFileRoute("/_authenticated/purchases")({
   head: () => ({ meta: [{ title: "Purchases — Photon POS" }] }),
-  component: PurchasesPage,
+  component: () => <RoleGate level="manager"><PurchasesPage /></RoleGate>,
 });
 
 type Purchase = { id: string; reference_no: string | null; purchase_date: string; total: number; amount_paid: number; payment_status: string; supplier_id: string | null };
