@@ -541,6 +541,16 @@ function PosPage() {
                 </Select>
               </div>
             )}
+            <div className="grid grid-cols-[1fr_110px] gap-2">
+              <div>
+                <Label className="text-xs">Shipping address (optional)</Label>
+                <Input placeholder="Delivery address" value={shippingAddress} onChange={(e) => setShippingAddress(e.target.value)} />
+              </div>
+              <div>
+                <Label className="text-xs">Ship. fee</Label>
+                <Input type="number" min={0} step="0.01" value={shippingCharges || ""} onChange={(e) => setShippingCharges(Number(e.target.value) || 0)} />
+              </div>
+            </div>
           </div>
 
           <div className="space-y-1 pt-2 border-t text-sm">
