@@ -1147,6 +1147,19 @@ export type Database = {
         }
         Returns: boolean
       }
+      increment_stock: {
+        Args: { p_product_id: string; p_quantity: number }
+        Returns: undefined
+      }
+      list_users_with_roles: {
+        Args: never
+        Returns: {
+          created_at: string
+          email: string
+          roles: Database["public"]["Enums"]["app_role"][]
+          user_id: string
+        }[]
+      }
     }
     Enums: {
       app_role: "admin" | "manager" | "cashier"
