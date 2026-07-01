@@ -7,10 +7,11 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
+import { RoleGate } from "@/components/role-gate";
 
 export const Route = createFileRoute("/_authenticated/settings")({
   head: () => ({ meta: [{ title: "Settings — Photon POS" }] }),
-  component: SettingsPage,
+  component: () => <RoleGate level="admin"><SettingsPage /></RoleGate>,
 });
 
 type Settings = {
