@@ -70,12 +70,11 @@ function PurchasesPage() {
       unit_cost: l.unit_cost, quantity: l.quantity, line_total: l.unit_cost * l.quantity,
     }));
     await supabase.from("purchase_items").insert(items);
-    // bump stock
-    await Promise.all(lines.map(async (l) => {
-      const cur = products.find((p) => p.id === l.product_id);
-      if (!cur) return;
-      await supabase.from("products").update({ stock: cur.stock + l.quantity }).eq("id", l.product_id);
-    }));
+    // Atomic stock bump via RPC — safe under concurrent purchases/sales
+    await Promise.all(lines.map((l) =>
+      (supabase as unknown as { rpc: (n: string, a: Record<string, unknown>) => Promise<{ error: { message: string } | null }> })
+        .rpc("increment_stock", { p_product_id: l.product_id, p_quantity: l.quantity }),
+    ));
     toast.success("Purchase recorded");
     setOpen(false); setLines([]); setSupplierId(""); setReference(""); setPaid(0); setPayment("cash");
     load();
