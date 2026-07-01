@@ -25,19 +25,6 @@ type Product = {
   image_url: string | null;
 };
 
-const CATEGORIES = [
-  "wiring",
-  "circuit-protection",
-  "lighting",
-  "appliances",
-  "audio",
-  "phone-accessories",
-  "computer-accessories",
-  "tv-mounts",
-  "watches",
-  "general",
-];
-
 const empty: Omit<Product, "id"> = {
   name: "",
   sku: "",
@@ -57,15 +44,21 @@ export const Route = createFileRoute("/_authenticated/products")({
 
 function ProductsPage() {
   const [products, setProducts] = useState<Product[]>([]);
+  const [categories, setCategories] = useState<string[]>(["general"]);
   const [open, setOpen] = useState(false);
   const [editing, setEditing] = useState<Product | null>(null);
   const [form, setForm] = useState(empty);
   const [search, setSearch] = useState("");
 
   const load = async () => {
-    const { data, error } = await supabase.from("products").select("*").order("name");
+    const [{ data, error }, { data: cats }] = await Promise.all([
+      supabase.from("products").select("*").order("name"),
+      supabase.from("categories").select("name").order("name"),
+    ]);
     if (error) return toast.error(error.message);
     setProducts((data ?? []) as Product[]);
+    const list = ((cats ?? []) as { name: string }[]).map((c) => c.name);
+    setCategories(list.length ? list : ["general"]);
   };
 
   useEffect(() => { load(); }, []);
@@ -150,7 +143,7 @@ function ProductsPage() {
                   <Select value={form.category} onValueChange={(v) => setForm({ ...form, category: v })}>
                     <SelectTrigger><SelectValue /></SelectTrigger>
                     <SelectContent>
-                      {CATEGORIES.map((c) => <SelectItem key={c} value={c}>{c}</SelectItem>)}
+                      {categories.map((c) => <SelectItem key={c} value={c}>{c}</SelectItem>)}
                     </SelectContent>
                   </Select>
                 </div>
