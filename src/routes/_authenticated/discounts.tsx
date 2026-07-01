@@ -19,7 +19,7 @@ type Row = { id: string; name: string; discount_type: "percentage" | "fixed"; di
 
 export const Route = createFileRoute("/_authenticated/discounts")({
   head: () => ({ meta: [{ title: "Discounts — Shop POS" }] }),
-  component: DiscountsPage,
+  component: () => <RoleGate level="manager"><DiscountsPage /></RoleGate>,
 });
 
 function DiscountsPage() {
