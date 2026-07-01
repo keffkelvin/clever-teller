@@ -4,7 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Trash2, FileText, RotateCcw } from "lucide-react";
+import { Trash2, FileText, RotateCcw, ArrowRightCircle } from "lucide-react";
 import { toast } from "sonner";
 import { formatMoney } from "@/lib/money";
 
@@ -18,6 +18,7 @@ export const Route = createFileRoute("/_authenticated/drafts")({
 export function DraftsList({ type, title, subtitle }: { type: "draft" | "quotation"; title: string; subtitle: string }) {
   const sb = supabase as unknown as { from: (t: string) => { select: (q: string) => { eq: (k: string, v: string) => { order: (c: string, o: { ascending: boolean }) => Promise<{ data: Row[] | null; error: { message: string } | null }> } }; delete: () => { eq: (k: string, v: string) => Promise<{ error: { message: string } | null }> } } };
   const [rows, setRows] = useState<Row[]>([]);
+  const isQuote = type === "quotation";
   const load = async () => {
     const { data, error } = await sb.from("drafts").select("id,reference_no,customer_name,contact_number,total,created_at").eq("draft_type", type).order("created_at", { ascending: false });
     if (error) return toast.error(error.message);
@@ -41,16 +42,19 @@ export function DraftsList({ type, title, subtitle }: { type: "draft" | "quotati
           <div className="py-16 text-center text-muted-foreground"><FileText className="h-10 w-10 mx-auto mb-2 opacity-40" /><p>No {title.toLowerCase()} yet</p></div>
         ) : (
           <Table>
-            <TableHeader><TableRow><TableHead>Date</TableHead><TableHead>Customer</TableHead><TableHead>Phone</TableHead><TableHead className="text-right">Total</TableHead><TableHead className="w-12"></TableHead></TableRow></TableHeader>
+            <TableHeader><TableRow><TableHead>Date</TableHead><TableHead>Ref #</TableHead><TableHead>Customer</TableHead><TableHead>Phone</TableHead><TableHead className="text-right">Total</TableHead><TableHead className="w-12"></TableHead></TableRow></TableHeader>
             <TableBody>{rows.map((r) => (
               <TableRow key={r.id}>
                 <TableCell>{new Date(r.created_at).toLocaleString("en-KE")}</TableCell>
+                <TableCell className="font-mono text-xs">{r.reference_no ?? r.id.slice(0, 8)}</TableCell>
                 <TableCell>{r.customer_name ?? "Walk-in"}</TableCell>
                 <TableCell className="text-muted-foreground">{r.contact_number ?? "—"}</TableCell>
                 <TableCell className="text-right font-semibold">{formatMoney(r.total)}</TableCell>
                 <TableCell className="flex justify-end gap-1">
-                  <Button asChild size="sm" variant="outline" title="Recall to POS">
-                    <Link to="/pos" search={{ draft: r.id }}><RotateCcw className="h-3 w-3" /> Recall</Link>
+                  <Button asChild size="sm" variant="outline" title={isQuote ? "Convert to sale in POS" : "Recall to POS"}>
+                    <Link to="/pos" search={{ draft: r.id }}>
+                      {isQuote ? <><ArrowRightCircle className="h-3 w-3" /> Convert to sale</> : <><RotateCcw className="h-3 w-3" /> Recall</>}
+                    </Link>
                   </Button>
                   <Button size="icon" variant="ghost" className="text-destructive" onClick={() => remove(r.id)}><Trash2 className="h-4 w-4" /></Button>
                 </TableCell>

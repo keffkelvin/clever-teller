@@ -15,7 +15,7 @@ export const Route = createFileRoute("/_authenticated/users")({
   component: UsersPage,
 });
 
-type Row = { user_id: string; role: AppRole; id: string };
+type Row = { user_id: string; email: string | null; created_at: string; roles: AppRole[] };
 
 function UsersPage() {
   const { isAdmin, loading } = useRoles();
@@ -25,22 +25,15 @@ function UsersPage() {
   const load = async () => {
     const { data: u } = await supabase.auth.getUser();
     setMe(u.user?.id ?? null);
-    const { data, error } = await supabase.from("user_roles").select("id,user_id,role");
+    const { data, error } = await (supabase as unknown as { rpc: (n: string) => Promise<{ data: Row[] | null; error: { message: string } | null }> })
+      .rpc("list_users_with_roles");
     if (error) return toast.error(error.message);
     setRows((data ?? []) as Row[]);
   };
   useEffect(() => { load(); }, []);
 
-  const grouped: Record<string, AppRole[]> = {};
-  rows.forEach((r) => {
-    grouped[r.user_id] = grouped[r.user_id] ?? [];
-    grouped[r.user_id].push(r.role);
-  });
-
   const changeRole = async (userId: string, newRole: AppRole) => {
     await supabase.from("user_roles").delete().eq("user_id", userId);
-    const { data: u } = await supabase.auth.getUser();
-    if (!u.user) return;
     const { error } = await supabase.from("user_roles").insert({ user_id: userId, role: newRole });
     if (error) return toast.error(error.message);
     toast.success("Role updated");
@@ -70,18 +63,23 @@ function UsersPage() {
         <CardContent className="p-0">
           <Table>
             <TableHeader><TableRow>
-              <TableHead>User ID</TableHead>
+              <TableHead>Email</TableHead>
+              <TableHead>Joined</TableHead>
               <TableHead>Role</TableHead>
               <TableHead>Change role</TableHead>
               <TableHead></TableHead>
             </TableRow></TableHeader>
             <TableBody>
-              {Object.entries(grouped).map(([uid, roles]) => (
-                <TableRow key={uid}>
-                  <TableCell className="font-mono text-xs">{uid.slice(0, 8)}… {uid === me && <Badge variant="outline" className="ml-1">you</Badge>}</TableCell>
-                  <TableCell>{roles.map((r) => <Badge key={r} className="mr-1 capitalize">{r}</Badge>)}</TableCell>
+              {rows.map((r) => (
+                <TableRow key={r.user_id}>
                   <TableCell>
-                    <Select value={roles[0]} onValueChange={(v) => changeRole(uid, v as AppRole)} disabled={uid === me}>
+                    <div className="font-medium">{r.email ?? "—"}</div>
+                    <div className="font-mono text-xs text-muted-foreground">{r.user_id.slice(0, 8)}… {r.user_id === me && <Badge variant="outline" className="ml-1">you</Badge>}</div>
+                  </TableCell>
+                  <TableCell className="text-xs text-muted-foreground">{new Date(r.created_at).toLocaleDateString("en-KE")}</TableCell>
+                  <TableCell>{r.roles.length === 0 ? <Badge variant="outline">none</Badge> : r.roles.map((role) => <Badge key={role} className="mr-1 capitalize">{role}</Badge>)}</TableCell>
+                  <TableCell>
+                    <Select value={r.roles[0] ?? ""} onValueChange={(v) => changeRole(r.user_id, v as AppRole)} disabled={r.user_id === me}>
                       <SelectTrigger className="w-36"><SelectValue /></SelectTrigger>
                       <SelectContent>
                         <SelectItem value="admin">Admin</SelectItem>
@@ -91,7 +89,7 @@ function UsersPage() {
                     </Select>
                   </TableCell>
                   <TableCell className="text-right">
-                    <Button size="icon" variant="ghost" className="h-7 w-7 text-destructive" disabled={uid === me} onClick={() => removeUserRoles(uid)}><Trash2 className="h-3 w-3" /></Button>
+                    <Button size="icon" variant="ghost" className="h-7 w-7 text-destructive" disabled={r.user_id === me} onClick={() => removeUserRoles(r.user_id)}><Trash2 className="h-3 w-3" /></Button>
                   </TableCell>
                 </TableRow>
               ))}

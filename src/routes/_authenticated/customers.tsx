@@ -22,15 +22,26 @@ const empty = { name: "", phone: "", email: "", address: "", opening_balance: 0,
 
 function CustomersPage() {
   const [rows, setRows] = useState<Customer[]>([]);
+  const [balances, setBalances] = useState<Record<string, number>>({});
   const [open, setOpen] = useState(false);
   const [editing, setEditing] = useState<Customer | null>(null);
   const [form, setForm] = useState(empty);
   const [q, setQ] = useState("");
 
   const load = async () => {
-    const { data, error } = await supabase.from("customers").select("*").order("name");
+    const [{ data, error }, { data: due }] = await Promise.all([
+      supabase.from("customers").select("*").order("name"),
+      (supabase as unknown as { from: (t: string) => { select: (q: string) => { in: (k: string, v: string[]) => Promise<{ data: { customer_id: string | null; total: number; amount_paid: number | null }[] | null }> } } })
+        .from("sales").select("customer_id,total,amount_paid").in("payment_status", ["credit", "partial", "due"]),
+    ]);
     if (error) return toast.error(error.message);
     setRows((data ?? []) as Customer[]);
+    const bal: Record<string, number> = {};
+    for (const s of (due ?? [])) {
+      if (!s.customer_id) continue;
+      bal[s.customer_id] = (bal[s.customer_id] ?? 0) + (Number(s.total) - Number(s.amount_paid ?? 0));
+    }
+    setBalances(bal);
   };
   useEffect(() => { load(); }, []);
 
@@ -93,15 +104,18 @@ function CustomersPage() {
             <Table>
               <TableHeader><TableRow><TableHead>Name</TableHead><TableHead className="hidden md:table-cell">Phone</TableHead><TableHead className="hidden md:table-cell">Email</TableHead><TableHead className="text-right">Balance</TableHead><TableHead className="w-20"></TableHead></TableRow></TableHeader>
               <TableBody>
-                {filtered.map((c) => (
+                {filtered.map((c) => {
+                  const bal = Number(c.opening_balance) + (balances[c.id] ?? 0);
+                  return (
                   <TableRow key={c.id}>
                     <TableCell className="font-medium">{c.name}</TableCell>
                     <TableCell className="hidden md:table-cell text-muted-foreground">{c.phone || "—"}</TableCell>
                     <TableCell className="hidden md:table-cell text-muted-foreground">{c.email || "—"}</TableCell>
-                    <TableCell className="text-right">{formatMoney(c.opening_balance)}</TableCell>
+                    <TableCell className={`text-right ${bal > 0 ? "text-destructive font-medium" : ""}`}>{formatMoney(bal)}</TableCell>
                     <TableCell><div className="flex gap-1 justify-end"><Button size="icon" variant="ghost" onClick={() => openEdit(c)}><Pencil className="h-4 w-4" /></Button><Button size="icon" variant="ghost" className="text-destructive" onClick={() => remove(c)}><Trash2 className="h-4 w-4" /></Button></div></TableCell>
                   </TableRow>
-                ))}
+                  );
+                })}
               </TableBody>
             </Table>
           )}

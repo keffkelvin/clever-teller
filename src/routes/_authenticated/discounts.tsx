@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { RoleGate } from "@/components/role-gate";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -18,7 +19,7 @@ type Row = { id: string; name: string; discount_type: "percentage" | "fixed"; di
 
 export const Route = createFileRoute("/_authenticated/discounts")({
   head: () => ({ meta: [{ title: "Discounts — Shop POS" }] }),
-  component: DiscountsPage,
+  component: () => <RoleGate level="manager"><DiscountsPage /></RoleGate>,
 });
 
 function DiscountsPage() {

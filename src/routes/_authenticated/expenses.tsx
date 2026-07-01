@@ -12,10 +12,11 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Plus, Trash2, Wallet } from "lucide-react";
 import { toast } from "sonner";
 import { formatMoney } from "@/lib/money";
+import { RoleGate } from "@/components/role-gate";
 
 export const Route = createFileRoute("/_authenticated/expenses")({
   head: () => ({ meta: [{ title: "Expenses — Shop POS" }] }),
-  component: ExpensesPage,
+  component: () => <RoleGate level="manager"><ExpensesPage /></RoleGate>,
 });
 
 type Cat = { id: string; name: string };
