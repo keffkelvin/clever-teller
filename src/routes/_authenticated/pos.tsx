@@ -62,6 +62,8 @@ function PosPage() {
   const [payment, setPayment] = useState("cash");
   const [discount, setDiscount] = useState(0);
   const [taxRate, setTaxRate] = useState(0);
+  const [shippingAddress, setShippingAddress] = useState("");
+  const [shippingCharges, setShippingCharges] = useState(0);
   const [tendered, setTendered] = useState<string>("");
   const [processing, setProcessing] = useState(false);
   const searchRef = useRef<HTMLInputElement>(null);
@@ -79,7 +81,7 @@ function PosPage() {
         };
       };
     };
-    const [{ data: pd, error }, { data: cd }, { data: dd }, { data: reg }] = await Promise.all([
+    const [{ data: pd, error }, { data: cd }, { data: dd }, { data: reg }, { data: bs }] = await Promise.all([
       supabase
         .from("products")
         .select("id,name,sku,barcode,category,price,stock,image_url")
@@ -87,6 +89,7 @@ function PosPage() {
       supabase.from("customers").select("id,name,phone").order("name"),
       sbAny.from("discounts").select("id,name,discount_type,discount_amount,starts_at,ends_at,is_active").order("priority", { ascending: false }) as unknown as Promise<{ data: Discount[] | null; error: { message: string } | null }>,
       sbAny.from("cash_registers").select("id,opened_at,opening_cash").eq("status", "open").order("opened_at", { ascending: false }).maybeSingle() as unknown as Promise<{ data: OpenRegister | null }>,
+      supabase.from("business_settings").select("default_tax_rate").maybeSingle() as unknown as Promise<{ data: { default_tax_rate: number | null } | null }>,
     ]);
     if (error) return toast.error(error.message);
     setProducts((pd ?? []) as Product[]);
@@ -98,6 +101,8 @@ function PosPage() {
       (!d.ends_at || new Date(d.ends_at) >= now),
     ));
     setOpenRegister(reg ?? null);
+    const dr = Number((bs as { default_tax_rate?: number | null } | null)?.default_tax_rate);
+    if (!Number.isNaN(dr) && dr > 0) setTaxRate((cur) => cur || dr);
   };
 
   useEffect(() => { load(); searchRef.current?.focus(); }, []);
@@ -258,6 +263,7 @@ function PosPage() {
 
   const reset = () => {
     setCart([]); setCustomerId("walkin"); setDiscount(0); setTendered(""); setPayment("cash"); setDiscountId("none");
+    setShippingAddress(""); setShippingCharges(0);
   };
 
   const holdSale = async () => {
@@ -306,7 +312,7 @@ function PosPage() {
         discount: discount + promoAmount,
         tax,
         tax_rate: taxRate,
-        total,
+        total: total + Number(shippingCharges || 0),
         payment_method: payment,
         customer_name: cust?.name ?? null,
         customer_id: cust?.id ?? null,
@@ -315,6 +321,9 @@ function PosPage() {
         payment_status: status,
         sale_type: "pos",
         register_id: payment === "cash" ? openRegister?.id ?? null : null,
+        shipping_address: shippingAddress || null,
+        shipping_charges: Number(shippingCharges) || 0,
+        shipping_status: shippingAddress ? "pending" : null,
       } as never)
       .select()
       .single();
