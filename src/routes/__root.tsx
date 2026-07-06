@@ -80,10 +80,14 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "viewport", content: "width=device-width, initial-scale=1" },
       { title: "Photon POS — Shop point of sale" },
       { name: "description", content: "Point of sale, inventory, and reporting for electrical and electronics shops." },
-      { property: "og:title", content: "Photon POS" },
+      { property: "og:title", content: "Photon POS — Shop point of sale" },
       { property: "og:description", content: "Point of sale, inventory, and reporting for electrical and electronics shops." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
+      { name: "twitter:title", content: "Photon POS — Shop point of sale" },
+      { name: "twitter:description", content: "Point of sale, inventory, and reporting for electrical and electronics shops." },
+      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/5c9dfca6-a68c-4b19-8bcf-e9db1ffbd2d6/id-preview-9b4f9a54--0df935fa-95af-4b43-9425-8c1de7f413da.lovable.app-1783327324794.png" },
+      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/5c9dfca6-a68c-4b19-8bcf-e9db1ffbd2d6/id-preview-9b4f9a54--0df935fa-95af-4b43-9425-8c1de7f413da.lovable.app-1783327324794.png" },
     ],
     links: [
       {
