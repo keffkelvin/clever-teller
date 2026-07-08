@@ -483,9 +483,7 @@ function PosPage() {
       if (rate > 0) {
         const pts = Math.floor((Number(subtotal) / 100) * rate);
         if (pts > 0) {
-          await (supabase as unknown as { rpc: (n: string, a: Record<string, unknown>) => Promise<unknown> })
-            .rpc("noop", {}).catch(() => undefined);
-          const { data: cRow } = await supabase.from("customers").select("loyalty_points").eq("id", cust.id).maybeSingle();
+          const { data: cRow } = await supabase.from("customers").select("loyalty_points" as never).eq("id", cust.id).maybeSingle();
           const cur = Number((cRow as unknown as { loyalty_points?: number } | null)?.loyalty_points ?? 0);
           await supabase.from("customers").update({ loyalty_points: cur + pts } as never).eq("id", cust.id);
         }
