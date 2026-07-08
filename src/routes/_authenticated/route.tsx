@@ -47,6 +47,7 @@ const groups: NavGroup[] = [
     items: [
       { to: "/purchases", label: "List Purchases", icon: ShoppingBag },
       { to: "/purchase-returns", label: "Purchase Returns", icon: RotateCcw },
+      { to: "/supplier-payments", label: "Supplier Payments", icon: Wallet },
     ],
   },
   {
@@ -83,6 +84,7 @@ const groups: NavGroup[] = [
     icon: UserCog,
     items: [
       { to: "/users", label: "User Management", icon: UserCog },
+      { to: "/audit-log", label: "Audit Log", icon: ClipboardList },
     ],
   },
 ];
