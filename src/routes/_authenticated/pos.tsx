@@ -106,7 +106,7 @@ function PosPage() {
         .from("products")
         .select("id,name,sku,barcode,category,price,stock,low_stock_threshold,image_url")
         .order("name"),
-      supabase.from("customers").select("id,name,phone").order("name"),
+      supabase.from("customers").select("id,name,phone,email").order("name"),
       sbAny.from("discounts").select("id,name,discount_type,discount_amount,starts_at,ends_at,is_active").order("priority", { ascending: false }) as unknown as Promise<{ data: Discount[] | null; error: { message: string } | null }>,
       sbAny.from("cash_registers").select("id,opened_at,opening_cash").eq("status", "open").order("opened_at", { ascending: false }).maybeSingle() as unknown as Promise<{ data: OpenRegister | null }>,
       supabase.from("business_settings").select("default_tax_rate").maybeSingle() as unknown as Promise<{ data: { default_tax_rate: number | null } | null }>,
