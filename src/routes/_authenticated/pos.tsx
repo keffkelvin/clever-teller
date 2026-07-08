@@ -26,7 +26,7 @@ type Product = {
   low_stock_threshold: number | null;
   image_url: string | null;
 };
-type Customer = { id: string; name: string; phone: string | null };
+type Customer = { id: string; name: string; phone: string | null; email?: string | null };
 type Discount = {
   id: string;
   name: string;
