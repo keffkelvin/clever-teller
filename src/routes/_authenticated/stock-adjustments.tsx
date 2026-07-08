@@ -12,6 +12,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Plus } from "lucide-react";
 import { toast } from "sonner";
 import { RoleGate } from "@/components/role-gate";
+import { logAudit } from "@/lib/audit";
 
 export const Route = createFileRoute("/_authenticated/stock-adjustments")({
   head: () => ({ meta: [{ title: "Stock Adjustments — Shop POS" }] }),
@@ -53,6 +54,7 @@ function StockAdjustmentsPage() {
     if (ins.error) return toast.error(ins.error.message);
     const upd = await supabase.from("products").update({ stock: newStock }).eq("id", p.id);
     if (upd.error) return toast.error(upd.error.message);
+    await logAudit("stock", p.id, "adjust", { name: p.name, delta: signed, from: Number(p.stock), to: newStock, type: form.adjustment_type, reason: form.reason });
     toast.success("Stock adjusted");
     setOpen(false); load();
   };
