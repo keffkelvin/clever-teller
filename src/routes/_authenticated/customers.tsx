@@ -11,7 +11,7 @@ import { Plus, Pencil, Trash2, Users } from "lucide-react";
 import { toast } from "sonner";
 import { formatMoney } from "@/lib/money";
 
-type Customer = { id: string; name: string; phone: string | null; email: string | null; address: string | null; opening_balance: number; notes: string | null };
+type Customer = { id: string; name: string; phone: string | null; email: string | null; address: string | null; opening_balance: number; notes: string | null; loyalty_points?: number };
 
 export const Route = createFileRoute("/_authenticated/customers")({
   head: () => ({ meta: [{ title: "Customers — Photon POS" }] }),
@@ -102,7 +102,7 @@ function CustomersPage() {
             <div className="py-16 text-center text-muted-foreground"><Users className="h-10 w-10 mx-auto mb-2 opacity-40" /><p>No customers yet</p></div>
           ) : (
             <Table>
-              <TableHeader><TableRow><TableHead>Name</TableHead><TableHead className="hidden md:table-cell">Phone</TableHead><TableHead className="hidden md:table-cell">Email</TableHead><TableHead className="text-right">Balance</TableHead><TableHead className="w-20"></TableHead></TableRow></TableHeader>
+              <TableHeader><TableRow><TableHead>Name</TableHead><TableHead className="hidden md:table-cell">Phone</TableHead><TableHead className="hidden md:table-cell">Email</TableHead><TableHead className="text-right">Points</TableHead><TableHead className="text-right">Balance</TableHead><TableHead className="w-20"></TableHead></TableRow></TableHeader>
               <TableBody>
                 {filtered.map((c) => {
                   const bal = Number(c.opening_balance) + (balances[c.id] ?? 0);
@@ -111,6 +111,7 @@ function CustomersPage() {
                     <TableCell className="font-medium">{c.name}</TableCell>
                     <TableCell className="hidden md:table-cell text-muted-foreground">{c.phone || "—"}</TableCell>
                     <TableCell className="hidden md:table-cell text-muted-foreground">{c.email || "—"}</TableCell>
+                    <TableCell className="text-right">{Number(c.loyalty_points ?? 0)}</TableCell>
                     <TableCell className={`text-right ${bal > 0 ? "text-destructive font-medium" : ""}`}>{formatMoney(bal)}</TableCell>
                     <TableCell><div className="flex gap-1 justify-end"><Button size="icon" variant="ghost" onClick={() => openEdit(c)}><Pencil className="h-4 w-4" /></Button><Button size="icon" variant="ghost" className="text-destructive" onClick={() => remove(c)}><Trash2 className="h-4 w-4" /></Button></div></TableCell>
                   </TableRow>
