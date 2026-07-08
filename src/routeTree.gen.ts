@@ -16,6 +16,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedUsersRouteImport } from './routes/_authenticated/users'
 import { Route as AuthenticatedUnitsRouteImport } from './routes/_authenticated/units'
 import { Route as AuthenticatedSuppliersRouteImport } from './routes/_authenticated/suppliers'
+import { Route as AuthenticatedSupplierPaymentsRouteImport } from './routes/_authenticated/supplier-payments'
 import { Route as AuthenticatedStockAdjustmentsRouteImport } from './routes/_authenticated/stock-adjustments'
 import { Route as AuthenticatedShipmentsRouteImport } from './routes/_authenticated/shipments'
 import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated/settings'
@@ -74,6 +75,12 @@ const AuthenticatedSuppliersRoute = AuthenticatedSuppliersRouteImport.update({
   path: '/suppliers',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedSupplierPaymentsRoute =
+  AuthenticatedSupplierPaymentsRouteImport.update({
+    id: '/supplier-payments',
+    path: '/supplier-payments',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedStockAdjustmentsRoute =
   AuthenticatedStockAdjustmentsRouteImport.update({
     id: '/stock-adjustments',
@@ -222,6 +229,7 @@ export interface FileRoutesByFullPath {
   '/settings': typeof AuthenticatedSettingsRoute
   '/shipments': typeof AuthenticatedShipmentsRoute
   '/stock-adjustments': typeof AuthenticatedStockAdjustmentsRoute
+  '/supplier-payments': typeof AuthenticatedSupplierPaymentsRoute
   '/suppliers': typeof AuthenticatedSuppliersRoute
   '/units': typeof AuthenticatedUnitsRoute
   '/users': typeof AuthenticatedUsersRoute
@@ -253,6 +261,7 @@ export interface FileRoutesByTo {
   '/settings': typeof AuthenticatedSettingsRoute
   '/shipments': typeof AuthenticatedShipmentsRoute
   '/stock-adjustments': typeof AuthenticatedStockAdjustmentsRoute
+  '/supplier-payments': typeof AuthenticatedSupplierPaymentsRoute
   '/suppliers': typeof AuthenticatedSuppliersRoute
   '/units': typeof AuthenticatedUnitsRoute
   '/users': typeof AuthenticatedUsersRoute
@@ -286,6 +295,7 @@ export interface FileRoutesById {
   '/_authenticated/settings': typeof AuthenticatedSettingsRoute
   '/_authenticated/shipments': typeof AuthenticatedShipmentsRoute
   '/_authenticated/stock-adjustments': typeof AuthenticatedStockAdjustmentsRoute
+  '/_authenticated/supplier-payments': typeof AuthenticatedSupplierPaymentsRoute
   '/_authenticated/suppliers': typeof AuthenticatedSuppliersRoute
   '/_authenticated/units': typeof AuthenticatedUnitsRoute
   '/_authenticated/users': typeof AuthenticatedUsersRoute
@@ -319,6 +329,7 @@ export interface FileRouteTypes {
     | '/settings'
     | '/shipments'
     | '/stock-adjustments'
+    | '/supplier-payments'
     | '/suppliers'
     | '/units'
     | '/users'
@@ -350,6 +361,7 @@ export interface FileRouteTypes {
     | '/settings'
     | '/shipments'
     | '/stock-adjustments'
+    | '/supplier-payments'
     | '/suppliers'
     | '/units'
     | '/users'
@@ -382,6 +394,7 @@ export interface FileRouteTypes {
     | '/_authenticated/settings'
     | '/_authenticated/shipments'
     | '/_authenticated/stock-adjustments'
+    | '/_authenticated/supplier-payments'
     | '/_authenticated/suppliers'
     | '/_authenticated/units'
     | '/_authenticated/users'
@@ -449,6 +462,13 @@ declare module '@tanstack/react-router' {
       path: '/suppliers'
       fullPath: '/suppliers'
       preLoaderRoute: typeof AuthenticatedSuppliersRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/supplier-payments': {
+      id: '/_authenticated/supplier-payments'
+      path: '/supplier-payments'
+      fullPath: '/supplier-payments'
+      preLoaderRoute: typeof AuthenticatedSupplierPaymentsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/stock-adjustments': {
@@ -635,6 +655,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedSettingsRoute: typeof AuthenticatedSettingsRoute
   AuthenticatedShipmentsRoute: typeof AuthenticatedShipmentsRoute
   AuthenticatedStockAdjustmentsRoute: typeof AuthenticatedStockAdjustmentsRoute
+  AuthenticatedSupplierPaymentsRoute: typeof AuthenticatedSupplierPaymentsRoute
   AuthenticatedSuppliersRoute: typeof AuthenticatedSuppliersRoute
   AuthenticatedUnitsRoute: typeof AuthenticatedUnitsRoute
   AuthenticatedUsersRoute: typeof AuthenticatedUsersRoute
@@ -660,6 +681,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedSettingsRoute: AuthenticatedSettingsRoute,
   AuthenticatedShipmentsRoute: AuthenticatedShipmentsRoute,
   AuthenticatedStockAdjustmentsRoute: AuthenticatedStockAdjustmentsRoute,
+  AuthenticatedSupplierPaymentsRoute: AuthenticatedSupplierPaymentsRoute,
   AuthenticatedSuppliersRoute: AuthenticatedSuppliersRoute,
   AuthenticatedUnitsRoute: AuthenticatedUnitsRoute,
   AuthenticatedUsersRoute: AuthenticatedUsersRoute,
