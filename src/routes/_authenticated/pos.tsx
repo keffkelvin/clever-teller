@@ -475,7 +475,32 @@ function PosPage() {
           .rpc("decrement_stock", { p_product_id: l.product.id, p_quantity: l.qty }),
       ),
     );
-    toast.success(`Sale complete — ${formatMoney(grand)}${change ? ` · Change ${formatMoney(change)}` : ""}`);
+    // Loyalty accrual
+    if (cust) {
+      const { data: bs } = await (supabase as unknown as { from: (t: string) => { select: (q: string) => { eq: (k: string, v: string) => { maybeSingle: () => Promise<{ data: { loyalty_rate?: number } | null }> } } } })
+        .from("business_settings").select("loyalty_rate").eq("owner_id", user.id).maybeSingle();
+      const rate = Number(bs?.loyalty_rate ?? 0);
+      if (rate > 0) {
+        const pts = Math.floor((Number(subtotal) / 100) * rate);
+        if (pts > 0) {
+          await (supabase as unknown as { rpc: (n: string, a: Record<string, unknown>) => Promise<unknown> })
+            .rpc("noop", {}).catch(() => undefined);
+          const { data: cRow } = await supabase.from("customers").select("loyalty_points").eq("id", cust.id).maybeSingle();
+          const cur = Number((cRow as unknown as { loyalty_points?: number } | null)?.loyalty_points ?? 0);
+          await supabase.from("customers").update({ loyalty_points: cur + pts } as never).eq("id", cust.id);
+        }
+      }
+    }
+    const msg = `Receipt ${(sale as { invoice_no: string }).invoice_no}: ${formatMoney(grand)} at ${new Date().toLocaleString()}. Thank you!`;
+    const smsAction = cust?.phone
+      ? { label: "SMS", onClick: () => window.open(`sms:${cust.phone}?body=${encodeURIComponent(msg)}`) }
+      : cust?.email
+        ? { label: "Email", onClick: () => window.open(`mailto:${cust.email}?subject=${encodeURIComponent("Your receipt")}&body=${encodeURIComponent(msg)}`) }
+        : undefined;
+    toast.success(
+      `Sale complete — ${formatMoney(grand)}${change ? ` · Change ${formatMoney(change)}` : ""}`,
+      smsAction ? { action: smsAction } : undefined,
+    );
     if (andPrint) await printReceipt((sale as { invoice_no: string }).invoice_no);
     reset();
     setProcessing(false);
