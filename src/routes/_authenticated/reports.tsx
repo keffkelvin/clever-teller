@@ -16,7 +16,7 @@ export const Route = createFileRoute("/_authenticated/reports")({
 });
 
 type Sale = { id: string; total: number; subtotal: number; discount: number; tax: number | null; payment_method: string; created_at: string };
-type SaleItem = { product_name: string; quantity: number; unit_price: number; line_total: number; sale_id: string };
+type SaleItem = { product_name: string; quantity: number; unit_price: number; line_total: number; sale_id: string; product_id: string | null };
 type Purchase = { id: string; total: number; created_at: string };
 type Expense = { amount: number; expense_date: string; category_name: string | null };
 type Product = { id: string; name: string; stock: number; price: number; cost: number | null; low_stock_threshold: number | null };
@@ -59,7 +59,7 @@ function ReportsPage() {
       setProducts((pr.data ?? []) as Product[]);
       const ids = (s.data ?? []).map((x) => x.id);
       if (ids.length) {
-        const it = await supabase.from("sale_items").select("product_name,quantity,unit_price,line_total,sale_id").in("sale_id", ids);
+        const it = await supabase.from("sale_items").select("product_name,quantity,unit_price,line_total,sale_id,product_id").in("sale_id", ids);
         setItems((it.data ?? []) as SaleItem[]);
       } else setItems([]);
     })();
@@ -70,7 +70,9 @@ function ReportsPage() {
   const discountTotal = sales.reduce((s, x) => s + Number(x.discount), 0);
   const purchasesTotal = purchases.reduce((s, x) => s + Number(x.total), 0);
   const expenseTotal = expenses.reduce((s, x) => s + Number(x.amount), 0);
-  const profit = salesTotal - purchasesTotal - expenseTotal;
+  const costMap = useMemo(() => Object.fromEntries(products.map((p) => [p.id, Number(p.cost ?? 0)])), [products]);
+  const cogs = items.reduce((s, i) => s + Number(i.quantity) * (i.product_id ? (costMap[i.product_id] ?? 0) : 0), 0);
+  const profit = salesTotal - cogs - expenseTotal;
 
   const byPayment = useMemo(() => {
     const m: Record<string, number> = {};
@@ -108,7 +110,7 @@ function ReportsPage() {
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
         <Stat label="Sales" value={formatMoney(salesTotal)} />
-        <Stat label="Purchases" value={formatMoney(purchasesTotal)} />
+        <Stat label="COGS" value={formatMoney(cogs)} />
         <Stat label="Expenses" value={formatMoney(expenseTotal)} />
         <Stat label="Profit (est.)" value={formatMoney(profit)} accent={profit >= 0 ? "ok" : "bad"} />
       </div>
