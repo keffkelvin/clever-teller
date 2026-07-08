@@ -25,6 +25,8 @@ type Settings = {
   default_low_stock_threshold: number;
   receipt_header: string;
   receipt_footer: string;
+  tax_inclusive: boolean;
+  loyalty_rate: number;
 };
 
 const empty: Settings = {
@@ -38,6 +40,8 @@ const empty: Settings = {
   default_low_stock_threshold: 5,
   receipt_header: "",
   receipt_footer: "Thank you for your business!",
+  tax_inclusive: false,
+  loyalty_rate: 0,
 };
 
 function SettingsPage() {
@@ -62,6 +66,8 @@ function SettingsPage() {
           default_low_stock_threshold: data.default_low_stock_threshold,
           receipt_header: data.receipt_header ?? "",
           receipt_footer: data.receipt_footer,
+          tax_inclusive: Boolean((data as unknown as { tax_inclusive?: boolean }).tax_inclusive),
+          loyalty_rate: Number((data as unknown as { loyalty_rate?: number }).loyalty_rate ?? 0),
         });
       }
       setLoading(false);
@@ -107,6 +113,19 @@ function SettingsPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             <div><Label>VAT / tax rate (%)</Label><Input type="number" step="0.01" value={form.default_tax_rate} onChange={(e) => setForm({ ...form, default_tax_rate: Number(e.target.value) })} /></div>
             <div><Label>Default low-stock alert</Label><Input type="number" value={form.default_low_stock_threshold} onChange={(e) => setForm({ ...form, default_low_stock_threshold: Number(e.target.value) })} /></div>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <div>
+              <Label>Loyalty points rate (points per KSh 100)</Label>
+              <Input type="number" step="0.1" value={form.loyalty_rate} onChange={(e) => setForm({ ...form, loyalty_rate: Number(e.target.value) })} />
+              <p className="text-xs text-muted-foreground mt-1">Auto-accrued on completed sales tied to a customer.</p>
+            </div>
+            <div className="flex items-end">
+              <label className="flex items-center gap-2 text-sm cursor-pointer">
+                <input type="checkbox" checked={form.tax_inclusive} onChange={(e) => setForm({ ...form, tax_inclusive: e.target.checked })} />
+                Product prices include tax (VAT-inclusive)
+              </label>
+            </div>
           </div>
         </CardContent>
       </Card>
