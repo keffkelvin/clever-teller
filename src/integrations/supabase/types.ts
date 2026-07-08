@@ -14,6 +14,39 @@ export type Database = {
   }
   public: {
     Tables: {
+      audit_logs: {
+        Row: {
+          action: string
+          actor_id: string | null
+          created_at: string
+          details: Json | null
+          entity: string
+          entity_id: string | null
+          id: string
+          owner_id: string
+        }
+        Insert: {
+          action: string
+          actor_id?: string | null
+          created_at?: string
+          details?: Json | null
+          entity: string
+          entity_id?: string | null
+          id?: string
+          owner_id: string
+        }
+        Update: {
+          action?: string
+          actor_id?: string | null
+          created_at?: string
+          details?: Json | null
+          entity?: string
+          entity_id?: string | null
+          id?: string
+          owner_id?: string
+        }
+        Relationships: []
+      }
       brands: {
         Row: {
           created_at: string
@@ -53,11 +86,13 @@ export type Database = {
           id: string
           kra_pin: string | null
           logo_url: string | null
+          loyalty_rate: number
           owner_id: string
           phone: string | null
           receipt_footer: string
           receipt_header: string | null
           shop_name: string
+          tax_inclusive: boolean
           updated_at: string
         }
         Insert: {
@@ -71,11 +106,13 @@ export type Database = {
           id?: string
           kra_pin?: string | null
           logo_url?: string | null
+          loyalty_rate?: number
           owner_id: string
           phone?: string | null
           receipt_footer?: string
           receipt_header?: string | null
           shop_name?: string
+          tax_inclusive?: boolean
           updated_at?: string
         }
         Update: {
@@ -89,11 +126,13 @@ export type Database = {
           id?: string
           kra_pin?: string | null
           logo_url?: string | null
+          loyalty_rate?: number
           owner_id?: string
           phone?: string | null
           receipt_footer?: string
           receipt_header?: string | null
           shop_name?: string
+          tax_inclusive?: boolean
           updated_at?: string
         }
         Relationships: []
@@ -164,6 +203,7 @@ export type Database = {
           created_at: string
           email: string | null
           id: string
+          loyalty_points: number
           name: string
           notes: string | null
           opening_balance: number
@@ -176,6 +216,7 @@ export type Database = {
           created_at?: string
           email?: string | null
           id?: string
+          loyalty_points?: number
           name: string
           notes?: string | null
           opening_balance?: number
@@ -188,6 +229,7 @@ export type Database = {
           created_at?: string
           email?: string | null
           id?: string
+          loyalty_points?: number
           name?: string
           notes?: string | null
           opening_balance?: number
@@ -1034,6 +1076,60 @@ export type Database = {
             columns: ["product_id"]
             isOneToOne: false
             referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      supplier_payments: {
+        Row: {
+          amount: number
+          created_at: string
+          id: string
+          notes: string | null
+          owner_id: string
+          paid_at: string
+          payment_method: string
+          purchase_id: string | null
+          reference_no: string | null
+          supplier_id: string | null
+        }
+        Insert: {
+          amount?: number
+          created_at?: string
+          id?: string
+          notes?: string | null
+          owner_id: string
+          paid_at?: string
+          payment_method?: string
+          purchase_id?: string | null
+          reference_no?: string | null
+          supplier_id?: string | null
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          id?: string
+          notes?: string | null
+          owner_id?: string
+          paid_at?: string
+          payment_method?: string
+          purchase_id?: string | null
+          reference_no?: string | null
+          supplier_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "supplier_payments_purchase_id_fkey"
+            columns: ["purchase_id"]
+            isOneToOne: false
+            referencedRelation: "purchases"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "supplier_payments_supplier_id_fkey"
+            columns: ["supplier_id"]
+            isOneToOne: false
+            referencedRelation: "suppliers"
             referencedColumns: ["id"]
           },
         ]

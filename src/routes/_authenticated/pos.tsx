@@ -26,7 +26,7 @@ type Product = {
   low_stock_threshold: number | null;
   image_url: string | null;
 };
-type Customer = { id: string; name: string; phone: string | null };
+type Customer = { id: string; name: string; phone: string | null; email?: string | null };
 type Discount = {
   id: string;
   name: string;
@@ -106,7 +106,7 @@ function PosPage() {
         .from("products")
         .select("id,name,sku,barcode,category,price,stock,low_stock_threshold,image_url")
         .order("name"),
-      supabase.from("customers").select("id,name,phone").order("name"),
+      supabase.from("customers").select("id,name,phone,email").order("name"),
       sbAny.from("discounts").select("id,name,discount_type,discount_amount,starts_at,ends_at,is_active").order("priority", { ascending: false }) as unknown as Promise<{ data: Discount[] | null; error: { message: string } | null }>,
       sbAny.from("cash_registers").select("id,opened_at,opening_cash").eq("status", "open").order("opened_at", { ascending: false }).maybeSingle() as unknown as Promise<{ data: OpenRegister | null }>,
       supabase.from("business_settings").select("default_tax_rate").maybeSingle() as unknown as Promise<{ data: { default_tax_rate: number | null } | null }>,
@@ -475,7 +475,30 @@ function PosPage() {
           .rpc("decrement_stock", { p_product_id: l.product.id, p_quantity: l.qty }),
       ),
     );
-    toast.success(`Sale complete — ${formatMoney(grand)}${change ? ` · Change ${formatMoney(change)}` : ""}`);
+    // Loyalty accrual
+    if (cust) {
+      const { data: bs } = await (supabase as unknown as { from: (t: string) => { select: (q: string) => { eq: (k: string, v: string) => { maybeSingle: () => Promise<{ data: { loyalty_rate?: number } | null }> } } } })
+        .from("business_settings").select("loyalty_rate").eq("owner_id", user.id).maybeSingle();
+      const rate = Number(bs?.loyalty_rate ?? 0);
+      if (rate > 0) {
+        const pts = Math.floor((Number(subtotal) / 100) * rate);
+        if (pts > 0) {
+          const { data: cRow } = await supabase.from("customers").select("loyalty_points" as never).eq("id", cust.id).maybeSingle();
+          const cur = Number((cRow as unknown as { loyalty_points?: number } | null)?.loyalty_points ?? 0);
+          await supabase.from("customers").update({ loyalty_points: cur + pts } as never).eq("id", cust.id);
+        }
+      }
+    }
+    const msg = `Receipt ${(sale as { invoice_no: string }).invoice_no}: ${formatMoney(grand)} at ${new Date().toLocaleString()}. Thank you!`;
+    const smsAction = cust?.phone
+      ? { label: "SMS", onClick: () => window.open(`sms:${cust.phone}?body=${encodeURIComponent(msg)}`) }
+      : cust?.email
+        ? { label: "Email", onClick: () => window.open(`mailto:${cust.email}?subject=${encodeURIComponent("Your receipt")}&body=${encodeURIComponent(msg)}`) }
+        : undefined;
+    toast.success(
+      `Sale complete — ${formatMoney(grand)}${change ? ` · Change ${formatMoney(change)}` : ""}`,
+      smsAction ? { action: smsAction } : undefined,
+    );
     if (andPrint) await printReceipt((sale as { invoice_no: string }).invoice_no);
     reset();
     setProcessing(false);
