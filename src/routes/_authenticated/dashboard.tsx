@@ -4,6 +4,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { TrendingUp, ShoppingBag, AlertTriangle, Wallet, Package } from "lucide-react";
 import { formatMoney } from "@/lib/money";
@@ -23,13 +25,17 @@ function DashboardPage() {
   const [sales, setSales] = useState<Sale[]>([]);
   const [low, setLow] = useState<Product[]>([]);
   const [top, setTop] = useState<{ name: string; qty: number; total: number }[]>([]);
+  const [from, setFrom] = useState(() => { const d = new Date(); d.setDate(d.getDate() - 30); return d.toISOString().slice(0, 10); });
+  const [to, setTo] = useState(() => new Date().toISOString().slice(0, 10));
 
   useEffect(() => {
     (async () => {
-      const since = new Date(); since.setDate(since.getDate() - 30);
+      const since = new Date(from);
+      const until = new Date(new Date(to).getTime() + 86400000);
       const { data: s } = await supabase
         .from("sales").select("id,total,created_at,payment_method")
-        .gte("created_at", since.toISOString()).order("created_at", { ascending: false });
+        .gte("created_at", since.toISOString()).lt("created_at", until.toISOString())
+        .order("created_at", { ascending: false });
       setSales((s ?? []) as Sale[]);
 
       const { data: p } = await supabase.from("products").select("id,name,stock,low_stock_threshold,price");
@@ -38,7 +44,7 @@ function DashboardPage() {
 
       const { data: items } = await supabase
         .from("sale_items").select("product_name,quantity,line_total")
-        .gte("created_at", since.toISOString());
+        .gte("created_at", since.toISOString()).lt("created_at", until.toISOString());
       const map = new Map<string, { qty: number; total: number }>();
       (items ?? []).forEach((i: { product_name: string; quantity: number; line_total: number }) => {
         const cur = map.get(i.product_name) ?? { qty: 0, total: 0 };
@@ -50,7 +56,7 @@ function DashboardPage() {
       arr.sort((a, b) => b.qty - a.qty);
       setTop(arr.slice(0, 5));
     })();
-  }, []);
+  }, [from, to]);
 
   const today = new Date(); today.setHours(0, 0, 0, 0);
   const monthStart = new Date(); monthStart.setDate(1); monthStart.setHours(0, 0, 0, 0);
@@ -60,8 +66,11 @@ function DashboardPage() {
 
   const chartData = (() => {
     const days: { date: string; total: number }[] = [];
-    for (let i = 29; i >= 0; i--) {
-      const d = new Date(); d.setDate(d.getDate() - i); d.setHours(0, 0, 0, 0);
+    const start = new Date(from); start.setHours(0, 0, 0, 0);
+    const end = new Date(to); end.setHours(0, 0, 0, 0);
+    const span = Math.max(1, Math.round((end.getTime() - start.getTime()) / 86400000) + 1);
+    for (let i = 0; i < span; i++) {
+      const d = new Date(start); d.setDate(start.getDate() + i);
       const next = new Date(d); next.setDate(next.getDate() + 1);
       const total = sales
         .filter((s) => { const t = new Date(s.created_at); return t >= d && t < next; })
@@ -78,7 +87,11 @@ function DashboardPage() {
           <h1 className="text-2xl font-bold">Welcome back</h1>
           <p className="text-sm text-muted-foreground">Here's what's happening in your shop today.</p>
         </div>
-        <Button asChild><Link to="/pos">Open Register</Link></Button>
+        <div className="flex items-end gap-2">
+          <div><Label className="text-xs">From</Label><Input type="date" value={from} onChange={(e) => setFrom(e.target.value)} className="h-9" /></div>
+          <div><Label className="text-xs">To</Label><Input type="date" value={to} onChange={(e) => setTo(e.target.value)} className="h-9" /></div>
+          <Button asChild><Link to="/pos">Open Register</Link></Button>
+        </div>
       </div>
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
@@ -89,7 +102,7 @@ function DashboardPage() {
       </div>
 
       <Card>
-        <CardHeader><CardTitle>Sales last 30 days</CardTitle></CardHeader>
+        <CardHeader><CardTitle>Sales {from} → {to}</CardTitle></CardHeader>
         <CardContent>
           <div className="h-72">
             <ResponsiveContainer width="100%" height="100%">
