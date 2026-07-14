@@ -29,6 +29,8 @@ function AuthPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const [mode, setMode] = useState<"auth" | "forgot">("auth");
+  const [resetEmail, setResetEmail] = useState("");
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data }) => {
@@ -66,6 +68,19 @@ function AuthPage() {
     toast.success("Account created — you can sign in now");
   };
 
+  const handleForgot = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!resetEmail) return toast.error("Enter your email");
+    setLoading(true);
+    const { error } = await supabase.auth.resetPasswordForEmail(resetEmail, {
+      redirectTo: `${window.location.origin}/reset-password`,
+    });
+    setLoading(false);
+    if (error) return toast.error(error.message);
+    toast.success("Check your inbox for a reset link");
+    setMode("auth");
+  };
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background via-background to-muted px-4">
       <div className="w-full max-w-md">
@@ -77,10 +92,30 @@ function AuthPage() {
         </div>
         <Card>
           <CardHeader>
-            <CardTitle>Welcome</CardTitle>
-            <CardDescription>Sign in to manage sales and inventory</CardDescription>
+            <CardTitle>{mode === "forgot" ? "Reset password" : "Welcome"}</CardTitle>
+            <CardDescription>
+              {mode === "forgot"
+                ? "We'll email you a link to set a new password."
+                : "Sign in to manage sales and inventory"}
+            </CardDescription>
           </CardHeader>
           <CardContent>
+            {mode === "forgot" ? (
+              <form onSubmit={handleForgot} className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="fp-email">Email</Label>
+                  <Input id="fp-email" type="email" value={resetEmail}
+                    onChange={(e) => setResetEmail(e.target.value)} required />
+                </div>
+                <Button type="submit" className="w-full" disabled={loading}>
+                  {loading ? "Sending…" : "Send reset link"}
+                </Button>
+                <button type="button" onClick={() => setMode("auth")}
+                  className="w-full text-sm text-muted-foreground hover:underline">
+                  Back to sign in
+                </button>
+              </form>
+            ) : (
             <Tabs defaultValue="signin">
               <TabsList className="grid grid-cols-2 w-full">
                 <TabsTrigger value="signin">Sign in</TabsTrigger>
@@ -99,6 +134,10 @@ function AuthPage() {
                   <Button type="submit" className="w-full" disabled={loading}>
                     {loading ? "Signing in…" : "Sign in"}
                   </Button>
+                  <button type="button" onClick={() => { setResetEmail(email); setMode("forgot"); }}
+                    className="w-full text-sm text-muted-foreground hover:underline">
+                    Forgot password?
+                  </button>
                 </form>
               </TabsContent>
               <TabsContent value="signup">
@@ -117,6 +156,7 @@ function AuthPage() {
                 </form>
               </TabsContent>
             </Tabs>
+            )}
           </CardContent>
         </Card>
         <p className="text-center text-xs text-muted-foreground mt-4">

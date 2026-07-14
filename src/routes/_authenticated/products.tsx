@@ -9,9 +9,10 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Plus, Pencil, Trash2, Package } from "lucide-react";
+import { Plus, Pencil, Trash2, Package, Layers } from "lucide-react";
 import { toast } from "sonner";
 import { logAudit } from "@/lib/audit";
+import { ProductVariantsDialog } from "@/components/product-variants-dialog";
 
 type Product = {
   id: string;
@@ -56,6 +57,7 @@ function ProductsPage() {
   const [editing, setEditing] = useState<Product | null>(null);
   const [form, setForm] = useState(empty);
   const [search, setSearch] = useState("");
+  const [variantsFor, setVariantsFor] = useState<Product | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
 
   const load = async () => {
@@ -285,6 +287,7 @@ function ProductsPage() {
                     </TableCell>
                     <TableCell>
                       <div className="flex gap-1 justify-end">
+                        <Button size="icon" variant="ghost" title="Variants" onClick={() => setVariantsFor(p)}><Layers className="h-4 w-4" /></Button>
                         <Button size="icon" variant="ghost" onClick={() => openEdit(p)}><Pencil className="h-4 w-4" /></Button>
                         <Button size="icon" variant="ghost" className="text-destructive" onClick={() => remove(p)}><Trash2 className="h-4 w-4" /></Button>
                       </div>
@@ -296,6 +299,12 @@ function ProductsPage() {
           )}
         </CardContent>
       </Card>
+      <ProductVariantsDialog
+        open={!!variantsFor}
+        onOpenChange={(o) => { if (!o) setVariantsFor(null); }}
+        productId={variantsFor?.id ?? null}
+        productName={variantsFor?.name ?? ""}
+      />
     </div>
   );
 }
